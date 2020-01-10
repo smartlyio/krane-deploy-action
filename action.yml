@@ -2,9 +2,22 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  dockerRegistry:
+    description: 'Docker registry URI'
+    required: true
+  kubernetesServer:
+    description: 'Kubernetes server'
+    required: true
+  kubernetesContext:
+    description: 'Kubernetes context name. Usually the name of the cluster, but can be random'
+    required: true
+  kubernetesNamespace:
+    description: 'Kubernetes namespace name. Should be similar to service name'
+    required: true
+  kubernetesTemplateDir:
+    description: 'Directory with production manifests'
+    required: false
+    default: './kubernetes/production'
 runs:
   using: 'node12'
   main: 'dist/index.js'
