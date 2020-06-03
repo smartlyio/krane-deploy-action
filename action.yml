@@ -2,6 +2,9 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
+  currentSha:
+    description: 'Current source revision'
+    required: true
   dockerRegistry:
     description: 'Docker registry URI'
     required: true
@@ -18,6 +21,10 @@ inputs:
     description: 'Directory with production manifests'
     required: false
     default: './kubernetes/production'
+  kraneSelector:
+    description: 'Label selector for krane-managed kubernetes assets'
+    required: false
+    default: 'smartly.io/managed-by=krane'
 runs:
   using: 'node12'
   main: 'dist/index.js'
