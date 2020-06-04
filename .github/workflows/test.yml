@@ -26,6 +26,7 @@ jobs:
         # Make a dummy template directory
         mkdir ./templates
         touch ./templates/manifest.yml
+        touch ./templates/secrets.ejson
     - uses: ./
       env:
         KUBERNETES_AUTH_TOKEN: test
