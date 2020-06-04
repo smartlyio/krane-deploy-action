@@ -996,9 +996,10 @@ function run() {
             const kubernetesNamespace = core.getInput('kubernetesNamespace');
             const kraneTemplateDir = core.getInput('kubernetesTemplateDir');
             const kraneSelector = core.getInput('kraneSelector');
+            const kranePath = core.getInput('kranePath');
             yield kube_1.configureKube(kubernetesServer, kubernetesContext, kubernetesNamespace);
-            const renderedTemplates = yield krane_1.render(currentSha, dockerRegistry, kraneTemplateDir);
-            yield krane_1.deploy(kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates);
+            const renderedTemplates = yield krane_1.render(kranePath, currentSha, dockerRegistry, kraneTemplateDir);
+            yield krane_1.deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -1541,7 +1542,7 @@ const exec = __importStar(__webpack_require__(986));
 const fs = __importStar(__webpack_require__(826));
 const util_1 = __webpack_require__(669);
 const readdir = util_1.promisify(fs.readdir);
-function render(currentSha, dockerRegistry, kraneTemplateDir) {
+function render(kranePath, currentSha, dockerRegistry, kraneTemplateDir) {
     return __awaiter(this, void 0, void 0, function* () {
         let renderedTemplates = '';
         const renderOptions = {
@@ -1551,7 +1552,7 @@ function render(currentSha, dockerRegistry, kraneTemplateDir) {
                 }
             }
         };
-        yield exec.exec('krane', [
+        yield exec.exec(kranePath, [
             'render',
             `--current-sha=${currentSha}`,
             `--bindings=registry=${dockerRegistry}`,
@@ -1569,7 +1570,7 @@ function findEjsonFiles(kraneTemplateDir) {
     });
 }
 exports.findEjsonFiles = findEjsonFiles;
-function deploy(kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates) {
+function deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates) {
     return __awaiter(this, void 0, void 0, function* () {
         const ejsonPaths = yield findEjsonFiles(kraneTemplateDir);
         const deployCommand = [
@@ -1583,7 +1584,7 @@ function deploy(kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemp
         const deployOptions = {
             input: Buffer.from(renderedTemplates)
         };
-        yield exec.exec('krane', deployCommand, deployOptions);
+        yield exec.exec(kranePath, deployCommand, deployOptions);
     });
 }
 exports.deploy = deploy;

@@ -5,7 +5,6 @@ import mockfs from 'mock-fs'
 
 import {findEjsonFiles, render, deploy} from '../src/krane'
 
-
 describe('krane utilities', () => {
   beforeEach(() => {
     mockfs({
@@ -34,11 +33,15 @@ describe('krane utilities', () => {
       '--current-sha=my-sha',
       '--bindings=registry=my-reg',
       '--filenames=/nonono'
-    ];
+    ]
     const expectedOptions = {listeners: {stdout: expect.anything()}}
     await render('krane', 'my-sha', 'my-reg', '/nonono')
     expect(exec.exec).toHaveBeenCalledTimes(1)
-    expect(exec.exec).toHaveBeenCalledWith('krane', expectedArgs, expectedOptions)
+    expect(exec.exec).toHaveBeenCalledWith(
+      'krane',
+      expectedArgs,
+      expectedOptions
+    )
   })
 
   test('krane deploy', async () => {
@@ -51,10 +54,14 @@ describe('krane utilities', () => {
       '-',
       '/nonono/first.ejson',
       '/nonono/third.ejson'
-    ];
+    ]
     const expectedOptions = {input: expect.anything()}
     await deploy('krane', 'context', 'ns', 'krane=true', '/nonono', '')
     expect(exec.exec).toHaveBeenCalledTimes(1)
-    expect(exec.exec).toHaveBeenCalledWith('krane', expectedArgs, expectedOptions)
+    expect(exec.exec).toHaveBeenCalledWith(
+      'krane',
+      expectedArgs,
+      expectedOptions
+    )
   })
 })
