@@ -1,9 +1,6 @@
 jest.mock('@actions/exec')
 
 import * as exec from '@actions/exec'
-import * as io from '@actions/io'
-import * as fs from 'fs'
-import * as path from 'path'
 import mockfs from 'mock-fs'
 
 import {findEjsonFiles, render, deploy} from '../src/krane'
