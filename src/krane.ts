@@ -5,6 +5,7 @@ import {promisify} from 'util'
 const readdir = promisify(fs.readdir)
 
 async function render(
+  kranePath: string,
   currentSha: string,
   dockerRegistry: string,
   kraneTemplateDir: string
@@ -18,7 +19,7 @@ async function render(
     }
   }
   await exec.exec(
-    'krane',
+    kranePath,
     [
       'render',
       `--current-sha=${currentSha}`,
@@ -38,6 +39,7 @@ async function findEjsonFiles(kraneTemplateDir: string): Promise<string[]> {
 }
 
 async function deploy(
+  kranePath: string,
   kubernetesContext: string,
   kubernetesNamespace: string,
   kraneSelector: string,
@@ -58,7 +60,7 @@ async function deploy(
   const deployOptions = {
     input: Buffer.from(renderedTemplates)
   }
-  await exec.exec('krane', deployCommand, deployOptions)
+  await exec.exec(kranePath, deployCommand, deployOptions)
 }
 
 export {render, deploy, findEjsonFiles}

@@ -12,6 +12,7 @@ async function run(): Promise<void> {
     const kubernetesNamespace: string = core.getInput('kubernetesNamespace')
     const kraneTemplateDir: string = core.getInput('kubernetesTemplateDir')
     const kraneSelector: string = core.getInput('kraneSelector')
+    const kranePath: string = core.getInput('kranePath')
 
     await configureKube(
       kubernetesServer,
@@ -20,11 +21,13 @@ async function run(): Promise<void> {
     )
 
     const renderedTemplates = await render(
+      kranePath,
       currentSha,
       dockerRegistry,
       kraneTemplateDir
     )
     await deploy(
+      kranePath,
       kubernetesContext,
       kubernetesNamespace,
       kraneSelector,

@@ -25,6 +25,10 @@ inputs:
     description: 'Label selector for krane-managed kubernetes assets'
     required: false
     default: 'smartly.io/managed-by=krane'
+  kranePath:
+    description: 'Alternative path to krane binary (default krane on PATH)'
+    required: false
+    default: 'krane'
 runs:
   using: 'node12'
   main: 'dist/index.js'
