@@ -8,6 +8,7 @@ async function render(
   kranePath: string,
   currentSha: string,
   dockerRegistry: string,
+  clusterDomain: string,
   kraneTemplateDir: string
 ): Promise<string> {
   let renderedTemplates = ''
@@ -23,7 +24,7 @@ async function render(
     [
       'render',
       `--current-sha=${currentSha}`,
-      `--bindings=registry=${dockerRegistry}`,
+      `--bindings=cluster_domain=${clusterDomain},registry=${dockerRegistry}`,
       `--filenames=${kraneTemplateDir}`
     ],
     renderOptions

@@ -14,6 +14,9 @@ inputs:
   kubernetesContext:
     description: 'Kubernetes context name. Usually the name of the cluster, but can be random'
     required: true
+  kubernetesClusterDomain:
+    description: 'Fully qualified domain name of the cluster.'
+    required: true
   kubernetesNamespace:
     description: 'Kubernetes namespace name. Should be similar to service name'
     required: true
