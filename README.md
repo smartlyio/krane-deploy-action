@@ -37,7 +37,7 @@ jobs:
         with:
           currentSha: ${{ github.sha }}
           dockerRegistry: hub.docker.com
-          kubernetesServer: https://my-kubernetes-server:6443
+          kubernetesClusterDomain: my-kubernetes-server
           kubernetesContext: kube-prod
           kubernetesNamespace: my-service-name
 ```
