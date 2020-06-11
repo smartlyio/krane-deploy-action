@@ -31,11 +31,11 @@ describe('krane utilities', () => {
     const expectedArgs = [
       'render',
       '--current-sha=my-sha',
-      '--bindings=registry=my-reg',
+      '--bindings=cluster_domain=cluster.example.com,registry=my-reg',
       '--filenames=/nonono'
     ]
     const expectedOptions = {listeners: {stdout: expect.anything()}}
-    await render('krane', 'my-sha', 'my-reg', '/nonono')
+    await render('krane', 'my-sha', 'my-reg', 'cluster.example.com', '/nonono')
     expect(exec.exec).toHaveBeenCalledTimes(1)
     expect(exec.exec).toHaveBeenCalledWith(
       'krane',
