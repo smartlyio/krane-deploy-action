@@ -993,12 +993,13 @@ function run() {
             const dockerRegistry = core.getInput('dockerRegistry');
             const kubernetesServer = core.getInput('kubernetesServer');
             const kubernetesContext = core.getInput('kubernetesContext');
+            const kubernetesClusterDomain = core.getInput('kubernetesClusterDomain');
             const kubernetesNamespace = core.getInput('kubernetesNamespace');
             const kraneTemplateDir = core.getInput('kubernetesTemplateDir');
             const kraneSelector = core.getInput('kraneSelector');
             const kranePath = core.getInput('kranePath');
             yield kube_1.configureKube(kubernetesServer, kubernetesContext, kubernetesNamespace);
-            const renderedTemplates = yield krane_1.render(kranePath, currentSha, dockerRegistry, kraneTemplateDir);
+            const renderedTemplates = yield krane_1.render(kranePath, currentSha, dockerRegistry, kubernetesClusterDomain, kraneTemplateDir);
             yield krane_1.deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates);
         }
         catch (error) {
@@ -1542,7 +1543,7 @@ const exec = __importStar(__webpack_require__(986));
 const fs = __importStar(__webpack_require__(826));
 const util_1 = __webpack_require__(669);
 const readdir = util_1.promisify(fs.readdir);
-function render(kranePath, currentSha, dockerRegistry, kraneTemplateDir) {
+function render(kranePath, currentSha, dockerRegistry, clusterDomain, kraneTemplateDir) {
     return __awaiter(this, void 0, void 0, function* () {
         let renderedTemplates = '';
         const renderOptions = {
@@ -1555,7 +1556,7 @@ function render(kranePath, currentSha, dockerRegistry, kraneTemplateDir) {
         yield exec.exec(kranePath, [
             'render',
             `--current-sha=${currentSha}`,
-            `--bindings=registry=${dockerRegistry}`,
+            `--bindings=cluster_domain=${clusterDomain},registry=${dockerRegistry}`,
             `--filenames=${kraneTemplateDir}`
         ], renderOptions);
         return renderedTemplates;
