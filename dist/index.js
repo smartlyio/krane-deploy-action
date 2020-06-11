@@ -991,13 +991,16 @@ function run() {
         try {
             const currentSha = core.getInput('currentSha');
             const dockerRegistry = core.getInput('dockerRegistry');
-            const kubernetesServer = core.getInput('kubernetesServer');
+            let kubernetesServer = core.getInput('kubernetesServer');
             const kubernetesContext = core.getInput('kubernetesContext');
             const kubernetesClusterDomain = core.getInput('kubernetesClusterDomain');
             const kubernetesNamespace = core.getInput('kubernetesNamespace');
             const kraneTemplateDir = core.getInput('kubernetesTemplateDir');
             const kraneSelector = core.getInput('kraneSelector');
             const kranePath = core.getInput('kranePath');
+            if (kubernetesServer === '') {
+                kubernetesServer = `https://${kubernetesClusterDomain}:6443`;
+            }
             yield kube_1.configureKube(kubernetesServer, kubernetesContext, kubernetesNamespace);
             const renderedTemplates = yield krane_1.render(kranePath, currentSha, dockerRegistry, kubernetesClusterDomain, kraneTemplateDir);
             yield krane_1.deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates);

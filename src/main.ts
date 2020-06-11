@@ -7,7 +7,7 @@ async function run(): Promise<void> {
   try {
     const currentSha: string = core.getInput('currentSha')
     const dockerRegistry: string = core.getInput('dockerRegistry')
-    const kubernetesServer: string = core.getInput('kubernetesServer')
+    let kubernetesServer: string = core.getInput('kubernetesServer')
     const kubernetesContext: string = core.getInput('kubernetesContext')
     const kubernetesClusterDomain: string = core.getInput(
       'kubernetesClusterDomain'
@@ -16,6 +16,10 @@ async function run(): Promise<void> {
     const kraneTemplateDir: string = core.getInput('kubernetesTemplateDir')
     const kraneSelector: string = core.getInput('kraneSelector')
     const kranePath: string = core.getInput('kranePath')
+
+    if (kubernetesServer === '') {
+      kubernetesServer = `https://${kubernetesClusterDomain}:6443`
+    }
 
     await configureKube(
       kubernetesServer,

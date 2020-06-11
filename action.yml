@@ -9,8 +9,8 @@ inputs:
     description: 'Docker registry URI'
     required: true
   kubernetesServer:
-    description: 'Kubernetes server'
-    required: true
+    description: 'Kubernetes server. If this is not specified, the value used will be https://<kubernetesClusterDomain>:6443. Specify this paramater if a different server is required.'
+    required: false
   kubernetesContext:
     description: 'Kubernetes context name. Usually the name of the cluster, but can be random'
     required: true
