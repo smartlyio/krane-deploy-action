@@ -14,10 +14,19 @@ jobs:
     - run: |
         npm install
         npm run all
+    - run: npm run test
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - run: |
+        # Mock the krane executable
+        echo '#!/usr/bin/env bash' > ./krane.sh
+        chmod u+x ./krane.sh
+        # Make a dummy template directory
+        mkdir ./templates
+        touch ./templates/manifest.yml
+        touch ./templates/secrets.ejson
     - uses: ./
       env:
         KUBERNETES_AUTH_TOKEN: test
@@ -26,3 +35,5 @@ jobs:
         kubernetesServer: testServer
         kubernetesContext: testContext
         kubernetesNamespace: testNamespace
+        kubernetesTemplateDir: ./templates
+        kranePath: ./krane.sh

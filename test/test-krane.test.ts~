@@ -1,0 +1,3 @@
+test("Find's ejson files in template directory", async () => {
+  expect(1).toBe(2)
+})

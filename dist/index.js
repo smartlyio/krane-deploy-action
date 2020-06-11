@@ -354,13 +354,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const os = __webpack_require__(87);
-const events = __webpack_require__(614);
-const child = __webpack_require__(129);
-const path = __webpack_require__(622);
-const io = __webpack_require__(1);
-const ioUtil = __webpack_require__(672);
+const os = __importStar(__webpack_require__(87));
+const events = __importStar(__webpack_require__(614));
+const child = __importStar(__webpack_require__(129));
+const path = __importStar(__webpack_require__(622));
+const io = __importStar(__webpack_require__(1));
+const ioUtil = __importStar(__webpack_require__(672));
 /* eslint-disable @typescript-eslint/unbound-method */
 const IS_WINDOWS = process.platform === 'win32';
 /*
@@ -804,6 +811,12 @@ class ToolRunner extends events.EventEmitter {
                         resolve(exitCode);
                     }
                 });
+                if (this.options.input) {
+                    if (!cp.stdin) {
+                        throw new Error('child process missing stdin');
+                    }
+                    cp.stdin.end(this.options.input);
+                }
             });
         });
     }
@@ -971,33 +984,26 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
-const exec = __importStar(__webpack_require__(986));
+const kube_1 = __webpack_require__(747);
+const krane_1 = __webpack_require__(739);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const currentSha = core.getInput('currentSha');
             const dockerRegistry = core.getInput('dockerRegistry');
-            const kubernetesServer = core.getInput('kubernetesServer');
+            let kubernetesServer = core.getInput('kubernetesServer');
             const kubernetesContext = core.getInput('kubernetesContext');
+            const kubernetesClusterDomain = core.getInput('kubernetesClusterDomain');
             const kubernetesNamespace = core.getInput('kubernetesNamespace');
-            const kubernetesTemplateDir = core.getInput('kubernetesTemplateDir');
-            yield exec.exec(`kubectl config set-cluster`, [
-                kubernetesContext,
-                `--server=${kubernetesServer}`,
-                `--insecure-skip-tls-verify=true`
-            ]);
-            yield exec.exec(`kubectl config set-context`, [
-                kubernetesContext,
-                `--user=deploy`,
-                `--cluster=${kubernetesContext}`,
-                `--namespace=${kubernetesNamespace}`
-            ]);
-            yield exec.exec('/bin/bash -c "kubectl config set-credentials deploy --token=$KUBERNETES_AUTH_TOKEN"');
-            yield exec.exec('kubernetes-deploy', [
-                kubernetesNamespace,
-                kubernetesContext,
-                `--template-dir=${kubernetesTemplateDir}`,
-                `--bindings=registry=${dockerRegistry}`
-            ]);
+            const kraneTemplateDir = core.getInput('kubernetesTemplateDir');
+            const kraneSelector = core.getInput('kraneSelector');
+            const kranePath = core.getInput('kranePath');
+            if (kubernetesServer === '') {
+                kubernetesServer = `https://${kubernetesClusterDomain}:6443`;
+            }
+            yield kube_1.configureKube(kubernetesServer, kubernetesContext, kubernetesNamespace);
+            const renderedTemplates = yield krane_1.render(kranePath, currentSha, dockerRegistry, kubernetesClusterDomain, kraneTemplateDir);
+            yield krane_1.deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -1329,7 +1335,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const assert_1 = __webpack_require__(357);
-const fs = __webpack_require__(747);
+const fs = __webpack_require__(826);
 const path = __webpack_require__(622);
 _a = fs.promises, exports.chmod = _a.chmod, exports.copyFile = _a.copyFile, exports.lstat = _a.lstat, exports.mkdir = _a.mkdir, exports.readdir = _a.readdir, exports.readlink = _a.readlink, exports.rename = _a.rename, exports.rmdir = _a.rmdir, exports.stat = _a.stat, exports.symlink = _a.symlink, exports.unlink = _a.unlink;
 exports.IS_WINDOWS = process.platform === 'win32';
@@ -1514,7 +1520,127 @@ function isUnixExecutable(stats) {
 
 /***/ }),
 
+/***/ 739:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const exec = __importStar(__webpack_require__(986));
+const fs = __importStar(__webpack_require__(826));
+const util_1 = __webpack_require__(669);
+const readdir = util_1.promisify(fs.readdir);
+function render(kranePath, currentSha, dockerRegistry, clusterDomain, kraneTemplateDir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let renderedTemplates = '';
+        const renderOptions = {
+            listeners: {
+                stdout: (data) => {
+                    renderedTemplates += data.toString();
+                }
+            }
+        };
+        yield exec.exec(kranePath, [
+            'render',
+            `--current-sha=${currentSha}`,
+            `--bindings=cluster_domain=${clusterDomain},registry=${dockerRegistry}`,
+            `--filenames=${kraneTemplateDir}`
+        ], renderOptions);
+        return renderedTemplates;
+    });
+}
+exports.render = render;
+function findEjsonFiles(kraneTemplateDir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let ejsonFiles = yield readdir(kraneTemplateDir);
+        ejsonFiles = ejsonFiles.filter(filename => filename.endsWith('.ejson'));
+        return ejsonFiles.map(path => `${kraneTemplateDir}/${path}`);
+    });
+}
+exports.findEjsonFiles = findEjsonFiles;
+function deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const ejsonPaths = yield findEjsonFiles(kraneTemplateDir);
+        const deployCommand = [
+            'deploy',
+            kubernetesNamespace,
+            kubernetesContext,
+            `--selector=${kraneSelector}`,
+            '--filenames',
+            '-'
+        ].concat(ejsonPaths);
+        const deployOptions = {
+            input: Buffer.from(renderedTemplates)
+        };
+        yield exec.exec(kranePath, deployCommand, deployOptions);
+    });
+}
+exports.deploy = deploy;
+
+
+/***/ }),
+
 /***/ 747:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const exec = __importStar(__webpack_require__(986));
+function configureKube(server, context, namespace) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec.exec('kubectl config set-cluster', [
+            context,
+            `--server=${server}`,
+            `--insecure-skip-tls-verify=true`
+        ]);
+        yield exec.exec(`kubectl config set-context`, [
+            context,
+            `--user=deploy`,
+            `--cluster=${context}`,
+            `--namespace=${namespace}`
+        ]);
+        yield exec.exec('/bin/bash -c "kubectl config set-credentials deploy --token=$KUBERNETES_AUTH_TOKEN"');
+    });
+}
+exports.configureKube = configureKube;
+
+
+/***/ }),
+
+/***/ 826:
 /***/ (function(module) {
 
 module.exports = require("fs");
@@ -1535,8 +1661,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const tr = __webpack_require__(9);
+const tr = __importStar(__webpack_require__(9));
 /**
  * Exec a command.
  * Output will be streamed to the live console.

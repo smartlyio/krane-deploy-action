@@ -2,14 +2,20 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
+  currentSha:
+    description: 'Current source revision'
+    required: true
   dockerRegistry:
     description: 'Docker registry URI'
     required: true
   kubernetesServer:
-    description: 'Kubernetes server'
-    required: true
+    description: 'Kubernetes server. If this is not specified, the value used will be https://<kubernetesClusterDomain>:6443. Specify this paramater if a different server is required.'
+    required: false
   kubernetesContext:
     description: 'Kubernetes context name. Usually the name of the cluster, but can be random'
+    required: true
+  kubernetesClusterDomain:
+    description: 'Fully qualified domain name of the cluster.'
     required: true
   kubernetesNamespace:
     description: 'Kubernetes namespace name. Should be similar to service name'
@@ -18,6 +24,14 @@ inputs:
     description: 'Directory with production manifests'
     required: false
     default: './kubernetes/production'
+  kraneSelector:
+    description: 'Label selector for krane-managed kubernetes assets'
+    required: false
+    default: 'smartly.io/managed-by=krane'
+  kranePath:
+    description: 'Alternative path to krane binary (default krane on PATH)'
+    required: false
+    default: 'krane'
 runs:
   using: 'node12'
   main: 'dist/index.js'
