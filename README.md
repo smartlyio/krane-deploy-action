@@ -33,11 +33,11 @@ jobs:
       - name: Deploy
         env:
           KUBERNETES_AUTH_TOKEN: ${{ secrets.KUBERNETES_AUTH_TOKEN }}
-        uses: smartlyio/krane-deploy-action@v1
+        uses: smartlyio/krane-deploy-action@v2
         with:
           currentSha: ${{ github.sha }}
           dockerRegistry: hub.docker.com
-          kubernetesClusterDomain: my-kubernetes-server
+          kubernetesClusterDomain: my-kubernetes-server.example.com
           kubernetesContext: kube-prod
           kubernetesNamespace: my-service-name
 ```
