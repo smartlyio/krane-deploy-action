@@ -998,11 +998,12 @@ function run() {
             const kraneTemplateDir = core.getInput('kubernetesTemplateDir');
             const kraneSelector = core.getInput('kraneSelector');
             const kranePath = core.getInput('kranePath');
+            const extraBindings = JSON.parse(core.getInput('extraBindings'));
             if (kubernetesServer === '') {
                 kubernetesServer = `https://${kubernetesClusterDomain}:6443`;
             }
             yield kube_1.configureKube(kubernetesServer, kubernetesContext, kubernetesNamespace);
-            const renderedTemplates = yield krane_1.render(kranePath, currentSha, dockerRegistry, kubernetesClusterDomain, kraneTemplateDir);
+            const renderedTemplates = yield krane_1.render(kranePath, currentSha, dockerRegistry, kubernetesClusterDomain, kraneTemplateDir, extraBindings);
             yield krane_1.deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates);
         }
         catch (error) {
@@ -1545,8 +1546,37 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const exec = __importStar(__webpack_require__(986));
 const fs = __importStar(__webpack_require__(826));
 const util_1 = __webpack_require__(669);
+class InvalidBindings extends Error {
+}
 const readdir = util_1.promisify(fs.readdir);
-function render(kranePath, currentSha, dockerRegistry, clusterDomain, kraneTemplateDir) {
+function validateBindings(bindings) {
+    const bindingNames = Object.keys(bindings);
+    for (const key of bindingNames) {
+        // Ruby identifiers are consist of alphabets, decimal digits, and
+        // the underscore character, and begin with a alphabets(including
+        // underscore). There are no restrictions on the lengths of Ruby
+        // identifiers.
+        if (!/^[_a-zA-Z][_a-zA-Z0-9]*$/.test(key)) {
+            throw new InvalidBindings(`Binding name "${key}" should be a valid ruby identifier`);
+        }
+        const value = bindings[key];
+        if (value.includes('"')) {
+            throw new InvalidBindings(`Binding value for "${key}" shouldn't have a quote mark (") in it`);
+        }
+    }
+}
+function formatBindings(dockerRegistry, clusterDomain, extraBindings) {
+    const bindings = Object.assign({ 
+        /* eslint-disable @typescript-eslint/camelcase */
+        cluster_domain: clusterDomain, 
+        /* eslint-enable @typescript-eslint/camelcase */
+        registry: dockerRegistry }, extraBindings);
+    const bindingsParts = Object.keys(bindings).map(key => {
+        return `${key}="${bindings[key]}"`;
+    });
+    return bindingsParts.join(',');
+}
+function render(kranePath, currentSha, dockerRegistry, clusterDomain, kraneTemplateDir, extraBindings) {
     return __awaiter(this, void 0, void 0, function* () {
         let renderedTemplates = '';
         const renderOptions = {
@@ -1556,10 +1586,13 @@ function render(kranePath, currentSha, dockerRegistry, clusterDomain, kraneTempl
                 }
             }
         };
+        // Throws an error on validation failure
+        validateBindings(extraBindings);
+        const bindingsString = formatBindings(dockerRegistry, clusterDomain, extraBindings);
         yield exec.exec(kranePath, [
             'render',
             `--current-sha=${currentSha}`,
-            `--bindings=cluster_domain=${clusterDomain},registry=${dockerRegistry}`,
+            `--bindings=${bindingsString}`,
             `--filenames=${kraneTemplateDir}`
         ], renderOptions);
         return renderedTemplates;
