@@ -33,13 +33,18 @@ jobs:
       - name: Deploy
         env:
           KUBERNETES_AUTH_TOKEN: ${{ secrets.KUBERNETES_AUTH_TOKEN }}
-        uses: smartlyio/krane-deploy-action@v2
+        uses: smartlyio/krane-deploy-action@v3
         with:
           currentSha: ${{ github.sha }}
           dockerRegistry: hub.docker.com
           kubernetesClusterDomain: my-kubernetes-server.example.com
           kubernetesContext: kube-prod
           kubernetesNamespace: my-service-name
+          extraBindings: |
+            {
+              "canary_revision": "abc123",
+              "user": "deploy-user"
+            }
 ```
 
 Use [docker publish action](https://github.com/smartlyio/Publish-Docker-Github-Action) to build and push docker images in `build` job.
