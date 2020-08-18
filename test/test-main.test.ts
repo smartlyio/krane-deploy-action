@@ -6,17 +6,18 @@ import {mocked} from 'ts-jest/utils'
 
 import {main} from '../src/main'
 
+const currentSha: string = 'abc123'
+const dockerRegistry: string = 'dev.registry.example.com'
+const kubernetesContext: string = 'prod'
+const kubernetesClusterDomain: string = 'prod.example.com'
+const kubernetesNamespace: string = 'my-service'
+const kraneTemplateDir: string = 'kubernetes/production'
+const kraneSelector: string = 'managed-by=krane'
+const kranePath: string = 'krane'
+
 describe('main entry point', () => {
   test('Configures kube, renders and deploys', async () => {
-    const currentSha: string = 'abc123'
-    const dockerRegistry: string = 'dev.registry.example.com'
     const kubernetesServerRaw: string = ''
-    const kubernetesContext: string = 'prod'
-    const kubernetesClusterDomain: string = 'prod.example.com'
-    const kubernetesNamespace: string = 'my-service'
-    const kraneTemplateDir: string = 'kubernetes/production'
-    const kraneSelector: string = 'managed-by=krane'
-    const kranePath: string = 'krane'
     const extraBindingsRaw: string = '{}'
 
     const renderedTemplates: string = 'rendered templates'
@@ -68,15 +69,7 @@ describe('main entry point', () => {
   })
 
   test('Configures kube, renders and deploys with custom server', async () => {
-    const currentSha: string = 'abc123'
-    const dockerRegistry: string = 'dev.registry.example.com'
     const kubernetesServerRaw: string = 'https://other.example.com:6443'
-    const kubernetesContext: string = 'prod'
-    const kubernetesClusterDomain: string = 'prod.example.com'
-    const kubernetesNamespace: string = 'my-service'
-    const kraneTemplateDir: string = 'kubernetes/production'
-    const kraneSelector: string = 'managed-by=krane'
-    const kranePath: string = 'krane'
     const extraBindingsRaw: string = '{}'
 
     const renderedTemplates: string = 'rendered templates'
@@ -127,15 +120,7 @@ describe('main entry point', () => {
   })
 
   test('Validates JSON bindings invalid syntax', async () => {
-    const currentSha: string = 'abc123'
-    const dockerRegistry: string = 'dev.registry.example.com'
     const kubernetesServerRaw: string = ''
-    const kubernetesContext: string = 'prod'
-    const kubernetesClusterDomain: string = 'prod.example.com'
-    const kubernetesNamespace: string = 'my-service'
-    const kraneTemplateDir: string = 'kubernetes/production'
-    const kraneSelector: string = 'managed-by=krane'
-    const kranePath: string = 'krane'
     const extraBindingsRaw: string = '{'
 
     await expect(
@@ -159,15 +144,7 @@ describe('main entry point', () => {
   })
 
   test('Validates JSON wrong type string', async () => {
-    const currentSha: string = 'abc123'
-    const dockerRegistry: string = 'dev.registry.example.com'
     const kubernetesServerRaw: string = ''
-    const kubernetesContext: string = 'prod'
-    const kubernetesClusterDomain: string = 'prod.example.com'
-    const kubernetesNamespace: string = 'my-service'
-    const kraneTemplateDir: string = 'kubernetes/production'
-    const kraneSelector: string = 'managed-by=krane'
-    const kranePath: string = 'krane'
     const extraBindingsRaw: string = '"value"'
 
     await expect(
@@ -191,15 +168,7 @@ describe('main entry point', () => {
   })
 
   test('Validates JSON wrong type array', async () => {
-    const currentSha: string = 'abc123'
-    const dockerRegistry: string = 'dev.registry.example.com'
     const kubernetesServerRaw: string = ''
-    const kubernetesContext: string = 'prod'
-    const kubernetesClusterDomain: string = 'prod.example.com'
-    const kubernetesNamespace: string = 'my-service'
-    const kraneTemplateDir: string = 'kubernetes/production'
-    const kraneSelector: string = 'managed-by=krane'
-    const kranePath: string = 'krane'
     const extraBindingsRaw: string = '[]'
 
     await expect(
