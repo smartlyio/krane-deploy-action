@@ -1,5 +1,4 @@
 jest.mock('@actions/exec')
-console.log('wat')
 import * as exec from '@actions/exec'
 import mockfs from 'mock-fs'
 
