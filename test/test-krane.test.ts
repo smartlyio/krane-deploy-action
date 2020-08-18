@@ -36,7 +36,14 @@ describe('krane utilities', () => {
         '--filenames=/nonono'
       ]
       const expectedOptions = {listeners: {stdout: expect.anything()}}
-      await render('krane', 'my-sha', 'my-reg', 'cluster.example.com', '/nonono', {})
+      await render(
+        'krane',
+        'my-sha',
+        'my-reg',
+        'cluster.example.com',
+        '/nonono',
+        {}
+      )
       expect(exec.exec).toHaveBeenCalledTimes(1)
       expect(exec.exec).toHaveBeenCalledWith(
         'krane',
@@ -56,7 +63,14 @@ describe('krane utilities', () => {
         myExampleBinding: 'yes'
       }
       const expectedOptions = {listeners: {stdout: expect.anything()}}
-      await render('krane', 'my-sha', 'my-reg', 'cluster.example.com', '/nonono', bindings)
+      await render(
+        'krane',
+        'my-sha',
+        'my-reg',
+        'cluster.example.com',
+        '/nonono',
+        bindings
+      )
       expect(exec.exec).toHaveBeenCalledTimes(1)
       expect(exec.exec).toHaveBeenCalledWith(
         'krane',
@@ -67,12 +81,21 @@ describe('krane utilities', () => {
 
     test('extra bindings with spaces are not allowed', async () => {
       const bindings = {
-        "example binding": 'yes'
+        'example binding': 'yes'
       }
       const expectedOptions = {listeners: {stdout: expect.anything()}}
-      await expect(render('krane', 'my-sha', 'my-reg', 'cluster.example.com', '/nonono', bindings))
-        .rejects
-        .toThrow(/^Binding name "example binding" should be a valid ruby identifier/)
+      await expect(
+        render(
+          'krane',
+          'my-sha',
+          'my-reg',
+          'cluster.example.com',
+          '/nonono',
+          bindings
+        )
+      ).rejects.toThrow(
+        /^Binding name "example binding" should be a valid ruby identifier/
+      )
       expect(exec.exec).toHaveBeenCalledTimes(0)
     })
   })
