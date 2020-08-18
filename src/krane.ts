@@ -1,9 +1,51 @@
 import * as exec from '@actions/exec'
 import * as fs from 'fs'
 import {promisify} from 'util'
-import querystring from 'querystring'
+
+class InvalidBindings extends Error {}
 
 const readdir = promisify(fs.readdir)
+
+function validateBindings(bindings: Record<string, string>): void {
+  const bindingNames = Object.keys(bindings)
+  for (const key of bindingNames) {
+    // Ruby identifiers are consist of alphabets, decimal digits, and
+    // the underscore character, and begin with a alphabets(including
+    // underscore). There are no restrictions on the lengths of Ruby
+    // identifiers.
+    if (!/^[_a-zA-Z][_a-zA-Z0-9]*$/.test(key)) {
+      throw new InvalidBindings(
+        `Binding name "${key}" should be a valid ruby identifier`
+      )
+    }
+    const value = bindings[key]
+    if (value.includes('"')) {
+      throw new InvalidBindings(
+        `Binding value for "${key}" shouldn't have a quote mark (") in it`
+      )
+    }
+  }
+}
+
+function formatBindings(
+  dockerRegistry: string,
+  clusterDomain: string,
+  extraBindings: Record<string, string>
+): string {
+  const bindings: Record<string, string> = {
+    /* eslint-disable @typescript-eslint/camelcase */
+    cluster_domain: clusterDomain,
+    /* eslint-enable @typescript-eslint/camelcase */
+    registry: dockerRegistry,
+    ...extraBindings
+  }
+
+  const bindingsParts = Object.keys(bindings).map(key => {
+    return `${key}="${bindings[key]}"`
+  })
+
+  return bindingsParts.join(',')
+}
 
 async function render(
   kranePath: string,
@@ -12,7 +54,7 @@ async function render(
   clusterDomain: string,
   kraneTemplateDir: string,
   extraBindings: Record<string, string>
-): Promise<string> {
+): Promise<string | undefined> {
   let renderedTemplates = ''
   const renderOptions = {
     listeners: {
@@ -22,15 +64,14 @@ async function render(
     }
   }
 
-  const bindings = {
-    /* eslint-disable @typescript-eslint/camelcase */
-    cluster_domain: clusterDomain,
-    /* eslint-enable @typescript-eslint/camelcase */
-    registry: dockerRegistry,
-    ...extraBindings
-  }
+  // Throws an error on validation failure
+  validateBindings(extraBindings)
 
-  const bindingsString = querystring.stringify(bindings, ',')
+  const bindingsString = formatBindings(
+    dockerRegistry,
+    clusterDomain,
+    extraBindings
+  )
 
   await exec.exec(
     kranePath,

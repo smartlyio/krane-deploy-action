@@ -1,5 +1,5 @@
 jest.mock('@actions/exec')
-
+console.log('wat')
 import * as exec from '@actions/exec'
 import mockfs from 'mock-fs'
 
@@ -32,7 +32,7 @@ describe('krane utilities', () => {
       const expectedArgs = [
         'render',
         '--current-sha=my-sha',
-        '--bindings=cluster_domain=cluster.example.com,registry=my-reg',
+        '--bindings=cluster_domain="cluster.example.com",registry="my-reg"',
         '--filenames=/nonono'
       ]
       const expectedOptions = {listeners: {stdout: expect.anything()}}
@@ -49,7 +49,7 @@ describe('krane utilities', () => {
       const expectedArgs = [
         'render',
         '--current-sha=my-sha',
-        '--bindings=cluster_domain=cluster.example.com,registry=my-reg,myExampleBinding=yes',
+        '--bindings=cluster_domain="cluster.example.com",registry="my-reg",myExampleBinding="yes"',
         '--filenames=/nonono'
       ]
       const bindings = {
@@ -63,6 +63,17 @@ describe('krane utilities', () => {
         expectedArgs,
         expectedOptions
       )
+    })
+
+    test('extra bindings with spaces are not allowed', async () => {
+      const bindings = {
+        "example binding": 'yes'
+      }
+      const expectedOptions = {listeners: {stdout: expect.anything()}}
+      await expect(render('krane', 'my-sha', 'my-reg', 'cluster.example.com', '/nonono', bindings))
+        .rejects
+        .toThrow(/^Binding name "example binding" should be a valid ruby identifier/)
+      expect(exec.exec).toHaveBeenCalledTimes(0)
     })
   })
 
