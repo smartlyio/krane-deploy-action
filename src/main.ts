@@ -1,5 +1,12 @@
 import {configureKube} from './kube'
 import {render, deploy} from './krane'
+import Ajv from 'ajv'
+
+const ajv = new Ajv({allErrors: true})
+
+const validate = ajv.compile({
+  type: 'object'
+})
 
 export async function main(
   currentSha: string,
@@ -14,6 +21,11 @@ export async function main(
   extraBindingsRaw: string
 ): Promise<void> {
   const extraBindings: Record<string, string> = JSON.parse(extraBindingsRaw)
+  if (!validate(extraBindings)) {
+    throw new Error(
+      'Expected extraBindings to be a JSON object mapping binding names to values'
+    )
+  }
 
   let kubernetesServer = kubernetesServerRaw
   if (kubernetesServer === '') {

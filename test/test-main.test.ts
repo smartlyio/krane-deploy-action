@@ -126,7 +126,7 @@ describe('main entry point', () => {
     )
   })
 
-  test('Validates JSON bindings', async () => {
+  test('Validates JSON bindings invalid syntax', async () => {
     const currentSha: string = 'abc123'
     const dockerRegistry: string = 'dev.registry.example.com'
     const kubernetesServerRaw: string = ''
@@ -152,6 +152,70 @@ describe('main entry point', () => {
         extraBindingsRaw
       )
     ).rejects.toThrow(/^Unexpected end of JSON/)
+
+    expect(configureKube).toHaveBeenCalledTimes(0)
+    expect(render).toHaveBeenCalledTimes(0)
+    expect(deploy).toHaveBeenCalledTimes(0)
+  })
+
+  test('Validates JSON wrong type string', async () => {
+    const currentSha: string = 'abc123'
+    const dockerRegistry: string = 'dev.registry.example.com'
+    const kubernetesServerRaw: string = ''
+    const kubernetesContext: string = 'prod'
+    const kubernetesClusterDomain: string = 'prod.example.com'
+    const kubernetesNamespace: string = 'my-service'
+    const kraneTemplateDir: string = 'kubernetes/production'
+    const kraneSelector: string = 'managed-by=krane'
+    const kranePath: string = 'krane'
+    const extraBindingsRaw: string = '"value"'
+
+    await expect(
+      main(
+        currentSha,
+        dockerRegistry,
+        kubernetesServerRaw,
+        kubernetesContext,
+        kubernetesClusterDomain,
+        kubernetesNamespace,
+        kraneTemplateDir,
+        kraneSelector,
+        kranePath,
+        extraBindingsRaw
+      )
+    ).rejects.toThrow(/^Expected extraBindings to be a JSON object/)
+
+    expect(configureKube).toHaveBeenCalledTimes(0)
+    expect(render).toHaveBeenCalledTimes(0)
+    expect(deploy).toHaveBeenCalledTimes(0)
+  })
+
+  test('Validates JSON wrong type array', async () => {
+    const currentSha: string = 'abc123'
+    const dockerRegistry: string = 'dev.registry.example.com'
+    const kubernetesServerRaw: string = ''
+    const kubernetesContext: string = 'prod'
+    const kubernetesClusterDomain: string = 'prod.example.com'
+    const kubernetesNamespace: string = 'my-service'
+    const kraneTemplateDir: string = 'kubernetes/production'
+    const kraneSelector: string = 'managed-by=krane'
+    const kranePath: string = 'krane'
+    const extraBindingsRaw: string = '[]'
+
+    await expect(
+      main(
+        currentSha,
+        dockerRegistry,
+        kubernetesServerRaw,
+        kubernetesContext,
+        kubernetesClusterDomain,
+        kubernetesNamespace,
+        kraneTemplateDir,
+        kraneSelector,
+        kranePath,
+        extraBindingsRaw
+      )
+    ).rejects.toThrow(/^Expected extraBindings to be a JSON object/)
 
     expect(configureKube).toHaveBeenCalledTimes(0)
     expect(render).toHaveBeenCalledTimes(0)
