@@ -54,7 +54,7 @@ async function render(
   clusterDomain: string,
   kraneTemplateDir: string,
   extraBindings: Record<string, string>
-): Promise<string | undefined> {
+): Promise<string> {
   let renderedTemplates = ''
   const renderOptions = {
     listeners: {

@@ -16,7 +16,9 @@ async function run(): Promise<void> {
     const kraneTemplateDir: string = core.getInput('kubernetesTemplateDir')
     const kraneSelector: string = core.getInput('kraneSelector')
     const kranePath: string = core.getInput('kranePath')
-    const extraBindings: string = JSON.parse(core.getInput('extraBindings'))
+    const extraBindings: Record<string, string> = JSON.parse(
+      core.getInput('extraBindings')
+    )
 
     if (kubernetesServer === '') {
       kubernetesServer = `https://${kubernetesClusterDomain}:6443`
