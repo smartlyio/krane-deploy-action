@@ -1,6 +1,7 @@
 import * as exec from '@actions/exec'
 import * as fs from 'fs'
 import {promisify} from 'util'
+import querystring from 'querystring'
 
 const readdir = promisify(fs.readdir)
 
@@ -9,7 +10,8 @@ async function render(
   currentSha: string,
   dockerRegistry: string,
   clusterDomain: string,
-  kraneTemplateDir: string
+  kraneTemplateDir: string,
+  extraBindings: Record<string, string>
 ): Promise<string> {
   let renderedTemplates = ''
   const renderOptions = {
@@ -19,12 +21,23 @@ async function render(
       }
     }
   }
+
+  const bindings = {
+    /* eslint-disable @typescript-eslint/camelcase */
+    cluster_domain: clusterDomain,
+    /* eslint-enable @typescript-eslint/camelcase */
+    registry: dockerRegistry,
+    ...extraBindings
+  }
+
+  const bindingsString = querystring.stringify(bindings, ',')
+
   await exec.exec(
     kranePath,
     [
       'render',
       `--current-sha=${currentSha}`,
-      `--bindings=cluster_domain=${clusterDomain},registry=${dockerRegistry}`,
+      `--bindings=${bindingsString}`,
       `--filenames=${kraneTemplateDir}`
     ],
     renderOptions

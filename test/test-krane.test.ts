@@ -27,21 +27,43 @@ describe('krane utilities', () => {
     expect(ejsonFiles).toEqual(['/nonono/first.ejson', '/nonono/third.ejson'])
   })
 
-  test('krane render', async () => {
-    const expectedArgs = [
-      'render',
-      '--current-sha=my-sha',
-      '--bindings=cluster_domain=cluster.example.com,registry=my-reg',
-      '--filenames=/nonono'
-    ]
-    const expectedOptions = {listeners: {stdout: expect.anything()}}
-    await render('krane', 'my-sha', 'my-reg', 'cluster.example.com', '/nonono')
-    expect(exec.exec).toHaveBeenCalledTimes(1)
-    expect(exec.exec).toHaveBeenCalledWith(
-      'krane',
-      expectedArgs,
-      expectedOptions
-    )
+  describe('krane render', () => {
+    test('without extra bindings', async () => {
+      const expectedArgs = [
+        'render',
+        '--current-sha=my-sha',
+        '--bindings=cluster_domain=cluster.example.com,registry=my-reg',
+        '--filenames=/nonono'
+      ]
+      const expectedOptions = {listeners: {stdout: expect.anything()}}
+      await render('krane', 'my-sha', 'my-reg', 'cluster.example.com', '/nonono', {})
+      expect(exec.exec).toHaveBeenCalledTimes(1)
+      expect(exec.exec).toHaveBeenCalledWith(
+        'krane',
+        expectedArgs,
+        expectedOptions
+      )
+    })
+
+    test('with extra bindings', async () => {
+      const expectedArgs = [
+        'render',
+        '--current-sha=my-sha',
+        '--bindings=cluster_domain=cluster.example.com,registry=my-reg,myExampleBinding=yes',
+        '--filenames=/nonono'
+      ]
+      const bindings = {
+        myExampleBinding: 'yes'
+      }
+      const expectedOptions = {listeners: {stdout: expect.anything()}}
+      await render('krane', 'my-sha', 'my-reg', 'cluster.example.com', '/nonono', bindings)
+      expect(exec.exec).toHaveBeenCalledTimes(1)
+      expect(exec.exec).toHaveBeenCalledWith(
+        'krane',
+        expectedArgs,
+        expectedOptions
+      )
+    })
   })
 
   test('krane deploy', async () => {
