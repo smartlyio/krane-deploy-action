@@ -97,6 +97,26 @@ describe('krane utilities', () => {
       )
       expect(exec.exec).toHaveBeenCalledTimes(0)
     })
+
+    test('extra bindings with quotes in value', async () => {
+      const bindings = {
+        'exampleBinding': 'not"allowed'
+      }
+      const expectedOptions = {listeners: {stdout: expect.anything()}}
+      await expect(
+        render(
+          'krane',
+          'my-sha',
+          'my-reg',
+          'cluster.example.com',
+          '/nonono',
+          bindings
+        )
+      ).rejects.toThrow(
+        /^Binding value for "exampleBinding" shouldn't have a quote mark \("\) in it/
+      )
+      expect(exec.exec).toHaveBeenCalledTimes(0)
+    })
   })
 
   test('krane deploy', async () => {
