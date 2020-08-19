@@ -32,6 +32,10 @@ inputs:
     description: 'Alternative path to krane binary (default krane on PATH)'
     required: false
     default: 'krane'
+  extraBindings:
+    description: 'Additional template variable bindings to use in the krane render step; formatted as a JSON object mapping binding name to value.'
+    required: false
+    default: '{}'
 runs:
   using: 'node12'
   main: 'dist/index.js'

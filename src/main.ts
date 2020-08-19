@@ -1,50 +1,53 @@
-import * as core from '@actions/core'
-
 import {configureKube} from './kube'
 import {render, deploy} from './krane'
+import Ajv from 'ajv'
 
-async function run(): Promise<void> {
-  try {
-    const currentSha: string = core.getInput('currentSha')
-    const dockerRegistry: string = core.getInput('dockerRegistry')
-    let kubernetesServer: string = core.getInput('kubernetesServer')
-    const kubernetesContext: string = core.getInput('kubernetesContext')
-    const kubernetesClusterDomain: string = core.getInput(
-      'kubernetesClusterDomain'
-    )
-    const kubernetesNamespace: string = core.getInput('kubernetesNamespace')
-    const kraneTemplateDir: string = core.getInput('kubernetesTemplateDir')
-    const kraneSelector: string = core.getInput('kraneSelector')
-    const kranePath: string = core.getInput('kranePath')
+const ajv = new Ajv({allErrors: true})
 
-    if (kubernetesServer === '') {
-      kubernetesServer = `https://${kubernetesClusterDomain}:6443`
-    }
+const validate = ajv.compile({
+  type: 'object'
+})
 
-    await configureKube(
-      kubernetesServer,
-      kubernetesContext,
-      kubernetesNamespace
+export async function main(
+  currentSha: string,
+  dockerRegistry: string,
+  kubernetesServerRaw: string,
+  kubernetesContext: string,
+  kubernetesClusterDomain: string,
+  kubernetesNamespace: string,
+  kraneTemplateDir: string,
+  kraneSelector: string,
+  kranePath: string,
+  extraBindingsRaw: string
+): Promise<void> {
+  const extraBindings: Record<string, string> = JSON.parse(extraBindingsRaw)
+  if (!validate(extraBindings)) {
+    throw new Error(
+      'Expected extraBindings to be a JSON object mapping binding names to values'
     )
-
-    const renderedTemplates = await render(
-      kranePath,
-      currentSha,
-      dockerRegistry,
-      kubernetesClusterDomain,
-      kraneTemplateDir
-    )
-    await deploy(
-      kranePath,
-      kubernetesContext,
-      kubernetesNamespace,
-      kraneSelector,
-      kraneTemplateDir,
-      renderedTemplates
-    )
-  } catch (error) {
-    core.setFailed(error.message)
   }
-}
 
-run()
+  let kubernetesServer = kubernetesServerRaw
+  if (kubernetesServer === '') {
+    kubernetesServer = `https://${kubernetesClusterDomain}:6443`
+  }
+
+  await configureKube(kubernetesServer, kubernetesContext, kubernetesNamespace)
+
+  const renderedTemplates = await render(
+    kranePath,
+    currentSha,
+    dockerRegistry,
+    kubernetesClusterDomain,
+    kraneTemplateDir,
+    extraBindings
+  )
+  await deploy(
+    kranePath,
+    kubernetesContext,
+    kubernetesNamespace,
+    kraneSelector,
+    kraneTemplateDir,
+    renderedTemplates
+  )
+}
