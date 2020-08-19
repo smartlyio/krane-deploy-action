@@ -100,7 +100,7 @@ describe('krane utilities', () => {
 
     test('extra bindings with quotes in value', async () => {
       const bindings = {
-        'exampleBinding': 'not"allowed'
+        exampleBinding: 'not"allowed'
       }
       const expectedOptions = {listeners: {stdout: expect.anything()}}
       await expect(
