@@ -25,7 +25,7 @@
   "author": "YourNameOrOrganization",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "1.2.0",
+    "@actions/core": "1.2.5",
     "@actions/exec": "1.0.4",
     "ajv": "6.12.4"
   },
