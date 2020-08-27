@@ -31,7 +31,7 @@ describe('krane utilities', () => {
       const expectedArgs = [
         'render',
         '--current-sha=my-sha',
-        '--bindings=cluster_domain="cluster.example.com",registry="my-reg"',
+        '--bindings=cluster_domain=cluster.example.com,registry=my-reg',
         '--filenames=/nonono'
       ]
       const expectedOptions = {listeners: {stdout: expect.anything()}}
@@ -55,7 +55,7 @@ describe('krane utilities', () => {
       const expectedArgs = [
         'render',
         '--current-sha=my-sha',
-        '--bindings=cluster_domain="cluster.example.com",registry="my-reg",myExampleBinding="yes"',
+        '--bindings=cluster_domain=cluster.example.com,registry=my-reg,myExampleBinding=yes',
         '--filenames=/nonono'
       ]
       const bindings = {

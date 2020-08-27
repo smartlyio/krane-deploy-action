@@ -5007,7 +5007,7 @@ function formatBindings(dockerRegistry, clusterDomain, extraBindings) {
         /* eslint-enable @typescript-eslint/camelcase */
         registry: dockerRegistry }, extraBindings);
     const bindingsParts = Object.keys(bindings).map(key => {
-        return `${key}="${bindings[key]}"`;
+        return `${key}=${bindings[key]}`;
     });
     return bindingsParts.join(',');
 }
