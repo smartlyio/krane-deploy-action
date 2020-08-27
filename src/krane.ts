@@ -41,7 +41,7 @@ function formatBindings(
   }
 
   const bindingsParts = Object.keys(bindings).map(key => {
-    return `${key}="${bindings[key]}"`
+    return `${key}=${bindings[key]}`
   })
 
   return bindingsParts.join(',')
