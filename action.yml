@@ -1,6 +1,8 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'krane-deploy-action'
+description: |
+  A github action to deploy services to kubernetes with https://github.com/Shopify/krane.
+  this requires smartlyio/kubernetes-auth-action to be run first to configure acess to the cluster in use.
+author: 'Smartly.io'
 inputs:
   currentSha:
     description: 'Current source revision'
@@ -8,9 +10,6 @@ inputs:
   dockerRegistry:
     description: 'Docker registry URI'
     required: true
-  kubernetesServer:
-    description: 'Kubernetes server. If this is not specified, the value used will be https://<kubernetesClusterDomain>:6443. Specify this paramater if a different server is required.'
-    required: false
   kubernetesContext:
     description: 'Kubernetes context name. Usually the name of the cluster, but can be random'
     required: true

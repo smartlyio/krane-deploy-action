@@ -11,7 +11,6 @@ async function run(): Promise<void> {
   try {
     const currentSha: string = core.getInput('currentSha')
     const dockerRegistry: string = core.getInput('dockerRegistry')
-    const kubernetesServer: string = core.getInput('kubernetesServer')
     const kubernetesContext: string = core.getInput('kubernetesContext')
     const kubernetesClusterDomain: string = core.getInput(
       'kubernetesClusterDomain'
@@ -26,7 +25,6 @@ async function run(): Promise<void> {
     await main(
       currentSha,
       dockerRegistry,
-      kubernetesServer,
       kubernetesContext,
       kubernetesClusterDomain,
       kubernetesNamespace,

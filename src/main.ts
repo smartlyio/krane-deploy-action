@@ -1,4 +1,3 @@
-import {configureKube} from './kube'
 import {render, deploy} from './krane'
 import Ajv from 'ajv'
 
@@ -11,7 +10,6 @@ const validate = ajv.compile({
 export async function main(
   currentSha: string,
   dockerRegistry: string,
-  kubernetesServerRaw: string,
   kubernetesContext: string,
   kubernetesClusterDomain: string,
   kubernetesNamespace: string,
@@ -28,11 +26,6 @@ export async function main(
     )
   }
 
-  let kubernetesServer = kubernetesServerRaw
-  if (kubernetesServer === '') {
-    kubernetesServer = `https://${kubernetesClusterDomain}:6443`
-  }
-
   const renderedTemplates = await render(
     kranePath,
     currentSha,
@@ -45,8 +38,6 @@ export async function main(
   if (renderOnly) {
     return
   }
-
-  await configureKube(kubernetesServer, kubernetesContext, kubernetesNamespace)
 
   await deploy(
     kranePath,
