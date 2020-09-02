@@ -25,6 +25,27 @@ jobs:
     steps:
       - My awesome build job
 
+  validate:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      # Running with renderOnly:true does not require login
+      - name: Render templates
+        uses: smartlyio/krane-deploy-action@v3
+        with:
+          renderOnly: true
+          currentSha: ${{ github.sha }}
+          dockerRegistry: hub.docker.com
+          kubernetesClusterDomain: my-kubernetes-server.example.com
+          kubernetesContext: kube-prod
+          kubernetesNamespace: my-service-name
+          extraBindings: |
+            {
+              "canary_revision": "abc123",
+              "user": "deploy-user"
+            }
+
   deploy:
     needs: build
     runs-on: self-hosted
