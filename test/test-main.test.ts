@@ -1,6 +1,4 @@
 jest.mock('../src/krane')
-jest.mock('../src/kube')
-import {configureKube} from '../src/kube'
 import {render, deploy} from '../src/krane'
 import {mocked} from 'ts-jest/utils'
 
@@ -37,14 +35,6 @@ describe('main entry point', () => {
       kranePath,
       extraBindingsRaw,
       false
-    )
-
-    const kubernetesServer = `https://${kubernetesClusterDomain}:6443`
-    expect(configureKube).toHaveBeenCalledTimes(1)
-    expect(configureKube).toHaveBeenCalledWith(
-      kubernetesServer,
-      kubernetesContext,
-      kubernetesNamespace
     )
 
     const extraBindings: Record<string, string> = {}
@@ -90,13 +80,6 @@ describe('main entry point', () => {
       kranePath,
       extraBindingsRaw,
       false
-    )
-
-    expect(configureKube).toHaveBeenCalledTimes(1)
-    expect(configureKube).toHaveBeenCalledWith(
-      kubernetesServerRaw,
-      kubernetesContext,
-      kubernetesNamespace
     )
 
     const extraBindings: Record<string, string> = {}
@@ -155,7 +138,6 @@ describe('main entry point', () => {
       extraBindings
     )
 
-    expect(configureKube).not.toHaveBeenCalled()
     expect(deploy).not.toHaveBeenCalled()
   })
 
@@ -179,7 +161,6 @@ describe('main entry point', () => {
       )
     ).rejects.toThrow(/^Unexpected end of JSON/)
 
-    expect(configureKube).toHaveBeenCalledTimes(0)
     expect(render).toHaveBeenCalledTimes(0)
     expect(deploy).toHaveBeenCalledTimes(0)
   })
@@ -204,7 +185,6 @@ describe('main entry point', () => {
       )
     ).rejects.toThrow(/^Expected extraBindings to be a JSON object/)
 
-    expect(configureKube).toHaveBeenCalledTimes(0)
     expect(render).toHaveBeenCalledTimes(0)
     expect(deploy).toHaveBeenCalledTimes(0)
   })
@@ -229,7 +209,6 @@ describe('main entry point', () => {
       )
     ).rejects.toThrow(/^Expected extraBindings to be a JSON object/)
 
-    expect(configureKube).toHaveBeenCalledTimes(0)
     expect(render).toHaveBeenCalledTimes(0)
     expect(deploy).toHaveBeenCalledTimes(0)
   })

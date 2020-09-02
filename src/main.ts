@@ -1,4 +1,3 @@
-import {configureKube} from './kube'
 import {render, deploy} from './krane'
 import Ajv from 'ajv'
 
@@ -45,8 +44,6 @@ export async function main(
   if (renderOnly) {
     return
   }
-
-  await configureKube(kubernetesServer, kubernetesContext, kubernetesNamespace)
 
   await deploy(
     kranePath,
