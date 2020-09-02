@@ -33,7 +33,7 @@
     "@actions/io": "1.0.2",
     "@types/jest": "24.0.23",
     "@types/mock-fs": "4.10.0",
-    "@types/node": "12.12.14",
+    "@types/node": "12.12.55",
     "@typescript-eslint/parser": "2.10.0",
     "@zeit/ncc": "0.20.5",
     "eslint": "5.16.0",
