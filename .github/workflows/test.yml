@@ -22,6 +22,8 @@ jobs:
         npm run test
     - name: "Verify artefacts are up to date in the repository"
       run: |
+        git status || true
+        git diff || true
         # Error if there are changes after the build
         if [ "$(git status --porcelain | wc -c)" -gt "0" ]; then
             echo "Built artefacts (dist/*) were not updated by the pull request."
