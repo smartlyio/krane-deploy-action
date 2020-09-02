@@ -15,7 +15,6 @@ const kranePath: string = 'krane'
 
 describe('main entry point', () => {
   test('Configures kube, renders and deploys', async () => {
-    const kubernetesServerRaw: string = ''
     const extraBindingsRaw: string = '{}'
 
     const renderedTemplates: string = 'rendered templates'
@@ -26,7 +25,6 @@ describe('main entry point', () => {
     await main(
       currentSha,
       dockerRegistry,
-      kubernetesServerRaw,
       kubernetesContext,
       kubernetesClusterDomain,
       kubernetesNamespace,
@@ -60,7 +58,6 @@ describe('main entry point', () => {
   })
 
   test('Configures kube, renders and deploys with custom server', async () => {
-    const kubernetesServerRaw: string = 'https://other.example.com:6443'
     const extraBindingsRaw: string = '{}'
 
     const renderedTemplates: string = 'rendered templates'
@@ -71,7 +68,6 @@ describe('main entry point', () => {
     await main(
       currentSha,
       dockerRegistry,
-      kubernetesServerRaw,
       kubernetesContext,
       kubernetesClusterDomain,
       kubernetesNamespace,
@@ -105,7 +101,6 @@ describe('main entry point', () => {
   })
 
   test('Renders and does not configure kube or deploy', async () => {
-    const kubernetesServerRaw: string = ''
     const extraBindingsRaw: string = '{}'
 
     const renderedTemplates: string = 'rendered templates'
@@ -116,7 +111,6 @@ describe('main entry point', () => {
     await main(
       currentSha,
       dockerRegistry,
-      kubernetesServerRaw,
       kubernetesContext,
       kubernetesClusterDomain,
       kubernetesNamespace,
@@ -142,14 +136,12 @@ describe('main entry point', () => {
   })
 
   test('Validates JSON bindings invalid syntax', async () => {
-    const kubernetesServerRaw: string = ''
     const extraBindingsRaw: string = '{'
 
     await expect(
       main(
         currentSha,
         dockerRegistry,
-        kubernetesServerRaw,
         kubernetesContext,
         kubernetesClusterDomain,
         kubernetesNamespace,
@@ -166,14 +158,12 @@ describe('main entry point', () => {
   })
 
   test('Validates JSON wrong type string', async () => {
-    const kubernetesServerRaw: string = ''
     const extraBindingsRaw: string = '"value"'
 
     await expect(
       main(
         currentSha,
         dockerRegistry,
-        kubernetesServerRaw,
         kubernetesContext,
         kubernetesClusterDomain,
         kubernetesNamespace,
@@ -190,14 +180,12 @@ describe('main entry point', () => {
   })
 
   test('Validates JSON wrong type array', async () => {
-    const kubernetesServerRaw: string = ''
     const extraBindingsRaw: string = '[]'
 
     await expect(
       main(
         currentSha,
         dockerRegistry,
-        kubernetesServerRaw,
         kubernetesContext,
         kubernetesClusterDomain,
         kubernetesNamespace,
