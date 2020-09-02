@@ -10,7 +10,6 @@ const validate = ajv.compile({
 export async function main(
   currentSha: string,
   dockerRegistry: string,
-  kubernetesServerRaw: string,
   kubernetesContext: string,
   kubernetesClusterDomain: string,
   kubernetesNamespace: string,
@@ -25,11 +24,6 @@ export async function main(
     throw new Error(
       'Expected extraBindings to be a JSON object mapping binding names to values'
     )
-  }
-
-  let kubernetesServer = kubernetesServerRaw
-  if (kubernetesServer === '') {
-    kubernetesServer = `https://${kubernetesClusterDomain}:6443`
   }
 
   const renderedTemplates = await render(
