@@ -30,9 +30,14 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
-      - name: Deploy
+      - uses: smartlyio/kubernetes-auth-action@v1
         env:
           KUBERNETES_AUTH_TOKEN: ${{ secrets.KUBERNETES_AUTH_TOKEN }}
+        with:
+          kubernetesClusterDomain: my-kubernetes-server.example.com
+          kubernetesContext: kube-prod
+          kubernetesNamespace: my-service-name
+      - name: Deploy
         uses: smartlyio/krane-deploy-action@v3
         with:
           currentSha: ${{ github.sha }}
