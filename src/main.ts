@@ -18,7 +18,8 @@ export async function main(
   kraneTemplateDir: string,
   kraneSelector: string,
   kranePath: string,
-  extraBindingsRaw: string
+  extraBindingsRaw: string,
+  renderOnly: boolean
 ): Promise<void> {
   const extraBindings: Record<string, string> = JSON.parse(extraBindingsRaw)
   if (!validate(extraBindings)) {
@@ -32,8 +33,6 @@ export async function main(
     kubernetesServer = `https://${kubernetesClusterDomain}:6443`
   }
 
-  await configureKube(kubernetesServer, kubernetesContext, kubernetesNamespace)
-
   const renderedTemplates = await render(
     kranePath,
     currentSha,
@@ -42,6 +41,13 @@ export async function main(
     kraneTemplateDir,
     extraBindings
   )
+
+  if (renderOnly) {
+    return
+  }
+
+  await configureKube(kubernetesServer, kubernetesContext, kubernetesNamespace)
+
   await deploy(
     kranePath,
     kubernetesContext,

@@ -35,7 +35,8 @@ describe('main entry point', () => {
       kraneTemplateDir,
       kraneSelector,
       kranePath,
-      extraBindingsRaw
+      extraBindingsRaw,
+      false
     )
 
     const kubernetesServer = `https://${kubernetesClusterDomain}:6443`
@@ -87,7 +88,8 @@ describe('main entry point', () => {
       kraneTemplateDir,
       kraneSelector,
       kranePath,
-      extraBindingsRaw
+      extraBindingsRaw,
+      false
     )
 
     expect(configureKube).toHaveBeenCalledTimes(1)
@@ -119,6 +121,44 @@ describe('main entry point', () => {
     )
   })
 
+  test('Renders and does not configure kube or deploy', async () => {
+    const kubernetesServerRaw: string = ''
+    const extraBindingsRaw: string = '{}'
+
+    const renderedTemplates: string = 'rendered templates'
+    mocked(render).mockImplementation(async () => {
+      return renderedTemplates
+    })
+
+    await main(
+      currentSha,
+      dockerRegistry,
+      kubernetesServerRaw,
+      kubernetesContext,
+      kubernetesClusterDomain,
+      kubernetesNamespace,
+      kraneTemplateDir,
+      kraneSelector,
+      kranePath,
+      extraBindingsRaw,
+      true
+    )
+
+    const extraBindings: Record<string, string> = {}
+    expect(render).toHaveBeenCalledTimes(1)
+    expect(render).toHaveBeenCalledWith(
+      kranePath,
+      currentSha,
+      dockerRegistry,
+      kubernetesClusterDomain,
+      kraneTemplateDir,
+      extraBindings
+    )
+
+    expect(configureKube).not.toHaveBeenCalled()
+    expect(deploy).not.toHaveBeenCalled()
+  })
+
   test('Validates JSON bindings invalid syntax', async () => {
     const kubernetesServerRaw: string = ''
     const extraBindingsRaw: string = '{'
@@ -134,7 +174,8 @@ describe('main entry point', () => {
         kraneTemplateDir,
         kraneSelector,
         kranePath,
-        extraBindingsRaw
+        extraBindingsRaw,
+        false
       )
     ).rejects.toThrow(/^Unexpected end of JSON/)
 
@@ -158,7 +199,8 @@ describe('main entry point', () => {
         kraneTemplateDir,
         kraneSelector,
         kranePath,
-        extraBindingsRaw
+        extraBindingsRaw,
+        false
       )
     ).rejects.toThrow(/^Expected extraBindings to be a JSON object/)
 
@@ -182,7 +224,8 @@ describe('main entry point', () => {
         kraneTemplateDir,
         kraneSelector,
         kranePath,
-        extraBindingsRaw
+        extraBindingsRaw,
+        false
       )
     ).rejects.toThrow(/^Expected extraBindings to be a JSON object/)
 
