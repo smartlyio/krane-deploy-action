@@ -26,8 +26,22 @@ jobs:
         # Make a dummy template directory
         mkdir ./templates
         touch ./templates/manifest.yml
+        touch ./templates/template.yml.erb
         touch ./templates/secrets.ejson
-    - uses: ./
+    - name: Test rendering only
+      uses: ./
+      env:
+        KUBERNETES_AUTH_TOKEN: test
+      with: 
+        dockerRegistry: testRegistry
+        kubernetesServer: testServer
+        kubernetesContext: testContext
+        kubernetesNamespace: testNamespace
+        kubernetesTemplateDir: ./templates
+        kranePath: ./krane.sh
+        renderOnly: true
+    - name: Test render and deploy
+      uses: ./
       env:
         KUBERNETES_AUTH_TOKEN: test
       with: 

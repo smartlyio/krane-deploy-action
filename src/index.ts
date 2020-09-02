@@ -2,6 +2,11 @@ import * as core from '@actions/core'
 
 import {main} from './main'
 
+function toBoolean(value: string): boolean {
+  const regexp = new RegExp(/^(true|1|on|yes)$/i)
+  return regexp.test(value.trim())
+}
+
 async function run(): Promise<void> {
   try {
     const currentSha: string = core.getInput('currentSha')
@@ -16,6 +21,7 @@ async function run(): Promise<void> {
     const kraneSelector: string = core.getInput('kraneSelector')
     const kranePath: string = core.getInput('kranePath')
     const extraBindings: string = core.getInput('extraBindings')
+    const renderOnly: boolean = toBoolean(core.getInput('renderOnly'))
 
     await main(
       currentSha,
@@ -27,7 +33,8 @@ async function run(): Promise<void> {
       kraneTemplateDir,
       kraneSelector,
       kranePath,
-      extraBindings
+      extraBindings,
+      renderOnly
     )
   } catch (error) {
     core.setFailed(error.message)
