@@ -66,3 +66,4 @@ jobs:
         kubernetesNamespace: testNamespace
         kubernetesTemplateDir: ./templates
         kranePath: ./krane.sh
+        deployTimeout: 30s
