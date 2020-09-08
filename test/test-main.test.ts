@@ -12,6 +12,7 @@ const kubernetesNamespace: string = 'my-service'
 const kraneTemplateDir: string = 'kubernetes/production'
 const kraneSelector: string = 'managed-by=krane'
 const kranePath: string = 'krane'
+const timeout: string = '600s'
 
 describe('main entry point', () => {
   test('Configures kube, renders and deploys', async () => {
@@ -32,7 +33,8 @@ describe('main entry point', () => {
       kraneSelector,
       kranePath,
       extraBindingsRaw,
-      false
+      false,
+      timeout
     )
 
     const extraBindings: Record<string, string> = {}
@@ -53,7 +55,8 @@ describe('main entry point', () => {
       kubernetesNamespace,
       kraneSelector,
       kraneTemplateDir,
-      renderedTemplates
+      renderedTemplates,
+      timeout
     )
   })
 
@@ -75,7 +78,8 @@ describe('main entry point', () => {
       kraneSelector,
       kranePath,
       extraBindingsRaw,
-      false
+      false,
+      timeout
     )
 
     const extraBindings: Record<string, string> = {}
@@ -96,7 +100,8 @@ describe('main entry point', () => {
       kubernetesNamespace,
       kraneSelector,
       kraneTemplateDir,
-      renderedTemplates
+      renderedTemplates,
+      timeout
     )
   })
 
@@ -118,7 +123,8 @@ describe('main entry point', () => {
       kraneSelector,
       kranePath,
       extraBindingsRaw,
-      true
+      true,
+      timeout
     )
 
     const extraBindings: Record<string, string> = {}
@@ -149,7 +155,8 @@ describe('main entry point', () => {
         kraneSelector,
         kranePath,
         extraBindingsRaw,
-        false
+        false,
+        timeout
       )
     ).rejects.toThrow(/^Unexpected end of JSON/)
 
@@ -171,7 +178,8 @@ describe('main entry point', () => {
         kraneSelector,
         kranePath,
         extraBindingsRaw,
-        false
+        false,
+        timeout
       )
     ).rejects.toThrow(/^Expected extraBindings to be a JSON object/)
 
@@ -193,7 +201,8 @@ describe('main entry point', () => {
         kraneSelector,
         kranePath,
         extraBindingsRaw,
-        false
+        false,
+        timeout
       )
     ).rejects.toThrow(/^Expected extraBindings to be a JSON object/)
 

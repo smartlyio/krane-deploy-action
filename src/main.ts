@@ -17,7 +17,8 @@ export async function main(
   kraneSelector: string,
   kranePath: string,
   extraBindingsRaw: string,
-  renderOnly: boolean
+  renderOnly: boolean,
+  deployTimeout: string
 ): Promise<void> {
   const extraBindings: Record<string, string> = JSON.parse(extraBindingsRaw)
   if (!validate(extraBindings)) {
@@ -45,6 +46,7 @@ export async function main(
     kubernetesNamespace,
     kraneSelector,
     kraneTemplateDir,
-    renderedTemplates
+    renderedTemplates,
+    deployTimeout
   )
 }

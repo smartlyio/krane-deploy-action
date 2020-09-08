@@ -21,6 +21,7 @@ async function run(): Promise<void> {
     const kranePath: string = core.getInput('kranePath')
     const extraBindings: string = core.getInput('extraBindings')
     const renderOnly: boolean = toBoolean(core.getInput('renderOnly'))
+    const deployTimeout: string = core.getInput('deployTimeout')
 
     await main(
       currentSha,
@@ -32,7 +33,8 @@ async function run(): Promise<void> {
       kraneSelector,
       kranePath,
       extraBindings,
-      renderOnly
+      renderOnly,
+      deployTimeout
     )
   } catch (error) {
     core.setFailed(error.message)
