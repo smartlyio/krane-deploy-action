@@ -39,6 +39,10 @@ inputs:
     description: 'Only render templates, do not deploy. Default false (i.e. render and deploy) [true/false].'
     required: false
     default: 'false'
+  deployTimeout:
+    description: ''
+    required: false
+    default: '600s'
 runs:
   using: 'node12'
   main: 'dist/index.js'

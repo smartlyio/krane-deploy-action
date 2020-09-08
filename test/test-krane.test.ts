@@ -124,6 +124,7 @@ describe('krane utilities', () => {
       'deploy',
       'ns',
       'context',
+      '--global-timeout=600s',
       '--selector=krane=true',
       '--filenames',
       '-',
@@ -131,7 +132,7 @@ describe('krane utilities', () => {
       '/nonono/third.ejson'
     ]
     const expectedOptions = {input: expect.anything()}
-    await deploy('krane', 'context', 'ns', 'krane=true', '/nonono', '')
+    await deploy('krane', 'context', 'ns', 'krane=true', '/nonono', '', '600s')
     expect(exec.exec).toHaveBeenCalledTimes(1)
     expect(exec.exec).toHaveBeenCalledWith(
       'krane',

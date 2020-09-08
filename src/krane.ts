@@ -97,7 +97,8 @@ async function deploy(
   kubernetesNamespace: string,
   kraneSelector: string,
   kraneTemplateDir: string,
-  renderedTemplates: string
+  renderedTemplates: string,
+  deployTimeout: string
 ): Promise<void> {
   const ejsonPaths = await findEjsonFiles(kraneTemplateDir)
 
@@ -105,6 +106,7 @@ async function deploy(
     'deploy',
     kubernetesNamespace,
     kubernetesContext,
+    `--global-timeout=${deployTimeout}`,
     `--selector=${kraneSelector}`,
     '--filenames',
     '-'
