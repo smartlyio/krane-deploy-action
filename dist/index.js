@@ -1395,7 +1395,7 @@ const ajv = new ajv_1.default({ allErrors: true });
 const validate = ajv.compile({
     type: 'object'
 });
-function main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDomain, kubernetesNamespace, kraneTemplateDir, kraneSelector, kranePath, extraBindingsRaw, renderOnly) {
+function main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDomain, kubernetesNamespace, kraneTemplateDir, kraneSelector, kranePath, extraBindingsRaw, renderOnly, deployTimeout) {
     return __awaiter(this, void 0, void 0, function* () {
         const extraBindings = JSON.parse(extraBindingsRaw);
         if (!validate(extraBindings)) {
@@ -1405,7 +1405,7 @@ function main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDo
         if (renderOnly) {
             return;
         }
-        yield krane_1.deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates);
+        yield krane_1.deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates, deployTimeout);
     });
 }
 exports.main = main;
@@ -3795,7 +3795,8 @@ function run() {
             const kranePath = core.getInput('kranePath');
             const extraBindings = core.getInput('extraBindings');
             const renderOnly = toBoolean(core.getInput('renderOnly'));
-            yield main_1.main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDomain, kubernetesNamespace, kraneTemplateDir, kraneSelector, kranePath, extraBindings, renderOnly);
+            const deployTimeout = core.getInput('deployTimeout');
+            yield main_1.main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDomain, kubernetesNamespace, kraneTemplateDir, kraneSelector, kranePath, extraBindings, renderOnly, deployTimeout);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -4644,13 +4645,14 @@ function findEjsonFiles(kraneTemplateDir) {
     });
 }
 exports.findEjsonFiles = findEjsonFiles;
-function deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates) {
+function deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, renderedTemplates, deployTimeout) {
     return __awaiter(this, void 0, void 0, function* () {
         const ejsonPaths = yield findEjsonFiles(kraneTemplateDir);
         const deployCommand = [
             'deploy',
             kubernetesNamespace,
             kubernetesContext,
+            `--global-timeout=${deployTimeout}`,
             `--selector=${kraneSelector}`,
             '--filenames',
             '-'
