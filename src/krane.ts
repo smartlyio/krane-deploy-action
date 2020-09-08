@@ -33,9 +33,7 @@ function formatBindings(
   extraBindings: Record<string, string>
 ): string {
   const bindings: Record<string, string> = {
-    /* eslint-disable @typescript-eslint/camelcase */
     cluster_domain: clusterDomain,
-    /* eslint-enable @typescript-eslint/camelcase */
     registry: dockerRegistry,
     ...extraBindings
   }
