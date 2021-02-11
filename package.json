@@ -27,7 +27,7 @@
   "dependencies": {
     "@actions/core": "1.2.6",
     "@actions/exec": "1.0.4",
-    "ajv": "6.12.6"
+    "ajv": "7.1.0"
   },
   "devDependencies": {
     "@actions/io": "1.0.2",
