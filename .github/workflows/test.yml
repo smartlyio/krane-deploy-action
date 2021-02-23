@@ -47,7 +47,6 @@ jobs:
     - name: Test rendering only
       uses: ./
       env:
-        KUBERNETES_AUTH_TOKEN: test
         KRANE_BINDING_binding2: value2
       with:
         currentSha: ${{ github.sha }}
@@ -65,7 +64,6 @@ jobs:
     - name: Test render and deploy
       uses: ./
       env:
-        KUBERNETES_AUTH_TOKEN: test
         KRANE_BINDING_binding2: value2
       with:
         currentSha: ${{ github.sha }}
