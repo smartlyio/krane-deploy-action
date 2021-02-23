@@ -1437,6 +1437,25 @@ module.exports = function generate_contains(it, $keyword, $ruleType) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1450,19 +1469,47 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.main = void 0;
+exports.main = exports.getExtraBindings = exports.BINDING_PREFIX = void 0;
+const core = __importStar(__webpack_require__(470));
 const krane_1 = __webpack_require__(672);
 const ajv_1 = __importDefault(__webpack_require__(514));
 const ajv = new ajv_1.default({ allErrors: true });
 const validate = ajv.compile({
-    type: 'object'
+    type: 'object',
+    patternProperties: {
+        '^.*$': {
+            type: 'string'
+        }
+    }
 });
-function main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDomain, kubernetesNamespace, kraneTemplateDir, kraneSelector, kranePath, extraBindingsRaw, renderOnly, deployTimeout) {
+exports.BINDING_PREFIX = 'KRANE_BINDING_';
+function getExtraBindings(extraBindingsRaw) {
     return __awaiter(this, void 0, void 0, function* () {
         const extraBindings = JSON.parse(extraBindingsRaw);
         if (!validate(extraBindings)) {
-            throw new Error('Expected extraBindings to be a JSON object mapping binding names to values');
+            throw new Error('Expected extraBindings to be a JSON object mapping binding names to string values');
         }
+        const bindingInputs = Object.keys(process.env).filter(name => name.startsWith(exports.BINDING_PREFIX));
+        for (const bindingInput of bindingInputs) {
+            const bindingName = bindingInput
+                .replace(new RegExp(`^${exports.BINDING_PREFIX}`), '')
+                .toLowerCase();
+            const value = process.env[bindingInput];
+            if (value) {
+                core.info(`Adding krane binding ${bindingName}`);
+                extraBindings[bindingName] = value;
+            }
+            else {
+                core.warning(`Failed adding krane binding ${bindingName}: Value doesn't appear to exist!`);
+            }
+        }
+        return extraBindings;
+    });
+}
+exports.getExtraBindings = getExtraBindings;
+function main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDomain, kubernetesNamespace, kraneTemplateDir, kraneSelector, kranePath, extraBindingsRaw, renderOnly, deployTimeout) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const extraBindings = yield getExtraBindings(extraBindingsRaw);
         const renderedTemplates = yield krane_1.render(kranePath, currentSha, dockerRegistry, kubernetesClusterDomain, kraneTemplateDir, extraBindings);
         if (renderOnly) {
             return;
@@ -3858,10 +3905,10 @@ function run() {
             const kraneTemplateDir = core.getInput('kubernetesTemplateDir');
             const kraneSelector = core.getInput('kraneSelector');
             const kranePath = core.getInput('kranePath');
-            const extraBindings = core.getInput('extraBindings');
+            const extraBindingsRaw = core.getInput('extraBindings');
             const renderOnly = toBoolean(core.getInput('renderOnly'));
             const deployTimeout = core.getInput('deployTimeout');
-            yield main_1.main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDomain, kubernetesNamespace, kraneTemplateDir, kraneSelector, kranePath, extraBindings, renderOnly, deployTimeout);
+            yield main_1.main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDomain, kubernetesNamespace, kraneTemplateDir, kraneSelector, kranePath, extraBindingsRaw, renderOnly, deployTimeout);
         }
         catch (error) {
             core.setFailed(error.message);
