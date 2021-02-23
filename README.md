@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v2
       # Running with renderOnly:true does not require login
       - name: Render templates
-        uses: smartlyio/krane-deploy-action@v3
+        uses: smartlyio/krane-deploy-action@v4
         env:
           KRANE_BINDING_canary_revision: "abc123"
           KRANE_BINDING_user: "deploy-user"
@@ -58,7 +58,7 @@ jobs:
           kubernetesContext: kube-prod
           kubernetesNamespace: my-service-name
       - name: Deploy
-        uses: smartlyio/krane-deploy-action@v3
+        uses: smartlyio/krane-deploy-action@v4
         env:
           KRANE_BINDING_canary_revision: "abc123"
           KRANE_BINDING_user: "deploy-user"
