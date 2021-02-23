@@ -2,7 +2,7 @@ jest.mock('../src/krane')
 import {render, deploy} from '../src/krane'
 import {mocked} from 'ts-jest/utils'
 
-import {main} from '../src/main'
+import {main, getExtraBindings, BINDING_PREFIX} from '../src/main'
 
 const currentSha: string = 'abc123'
 const dockerRegistry: string = 'dev.registry.example.com'
@@ -13,6 +13,15 @@ const kraneTemplateDir: string = 'kubernetes/production'
 const kraneSelector: string = 'managed-by=krane'
 const kranePath: string = 'krane'
 const timeout: string = '600s'
+
+const OLD_ENV = process.env
+beforeEach(() => {
+  process.env = {...OLD_ENV}
+})
+
+afterEach(() => {
+  process.env = OLD_ENV
+})
 
 describe('main entry point', () => {
   test('Configures kube, renders and deploys', async () => {
@@ -105,8 +114,9 @@ describe('main entry point', () => {
     )
   })
 
-  test('Renders and does not configure kube or deploy', async () => {
-    const extraBindingsRaw: string = '{}'
+  test('Renders with custom bindings', async () => {
+    const extraBindingsRaw: string = '{"binding1": "value1"}'
+    process.env[`${BINDING_PREFIX}BINDING2`] = 'value2'
 
     const renderedTemplates: string = 'rendered templates'
     mocked(render).mockImplementation(async () => {
@@ -127,7 +137,10 @@ describe('main entry point', () => {
       timeout
     )
 
-    const extraBindings: Record<string, string> = {}
+    const extraBindings: Record<string, string> = {
+      binding1: "value1",
+      binding2: "value2"
+    }
     expect(render).toHaveBeenCalledTimes(1)
     expect(render).toHaveBeenCalledWith(
       kranePath,
@@ -140,73 +153,76 @@ describe('main entry point', () => {
 
     expect(deploy).not.toHaveBeenCalled()
   })
+})
 
+describe('get extra bindings', () => {
   test('Validates JSON bindings invalid syntax', async () => {
     const extraBindingsRaw: string = '{'
 
     await expect(
-      main(
-        currentSha,
-        dockerRegistry,
-        kubernetesContext,
-        kubernetesClusterDomain,
-        kubernetesNamespace,
-        kraneTemplateDir,
-        kraneSelector,
-        kranePath,
-        extraBindingsRaw,
-        false,
-        timeout
-      )
+      getExtraBindings(extraBindingsRaw)
     ).rejects.toThrow(/^Unexpected end of JSON/)
-
-    expect(render).toHaveBeenCalledTimes(0)
-    expect(deploy).toHaveBeenCalledTimes(0)
   })
 
   test('Validates JSON wrong type string', async () => {
     const extraBindingsRaw: string = '"value"'
 
     await expect(
-      main(
-        currentSha,
-        dockerRegistry,
-        kubernetesContext,
-        kubernetesClusterDomain,
-        kubernetesNamespace,
-        kraneTemplateDir,
-        kraneSelector,
-        kranePath,
-        extraBindingsRaw,
-        false,
-        timeout
-      )
+      getExtraBindings(extraBindingsRaw)
     ).rejects.toThrow(/^Expected extraBindings to be a JSON object/)
-
-    expect(render).toHaveBeenCalledTimes(0)
-    expect(deploy).toHaveBeenCalledTimes(0)
   })
 
   test('Validates JSON wrong type array', async () => {
     const extraBindingsRaw: string = '[]'
 
     await expect(
-      main(
-        currentSha,
-        dockerRegistry,
-        kubernetesContext,
-        kubernetesClusterDomain,
-        kubernetesNamespace,
-        kraneTemplateDir,
-        kraneSelector,
-        kranePath,
-        extraBindingsRaw,
-        false,
-        timeout
-      )
+      getExtraBindings(extraBindingsRaw)
     ).rejects.toThrow(/^Expected extraBindings to be a JSON object/)
+  })
 
-    expect(render).toHaveBeenCalledTimes(0)
-    expect(deploy).toHaveBeenCalledTimes(0)
+  test('Validates JSON wrong type value', async () => {
+    const extraBindingsRaw: string = '{"thing": 1}'
+
+    await expect(
+      getExtraBindings(extraBindingsRaw)
+    ).rejects.toThrow(/^Expected extraBindings to be a JSON object/)
+  })
+
+  test('Parses JSON extra bindings', async () => {
+    const expected = {"name": "value"}
+    const extraBindingsRaw: string = JSON.stringify(expected)
+
+    const bindings = await getExtraBindings(extraBindingsRaw)
+
+    expect(bindings).toEqual(expected)
+  })
+
+  test('Gets bindings from environment', async () => {
+    const expected = {"name": "value"}
+    process.env[`${BINDING_PREFIX}NAME`] = 'value'
+
+    const bindings = await getExtraBindings('{}')
+
+    expect(bindings).toEqual(expected)
+  })
+
+  test('Merges JSON bindings and environment bindings', async () => {
+    const expected = {"name": "value", "json": "jsonvalue"}
+    const extraBindingsRaw: string = '{"json": "jsonvalue"}'
+    process.env[`${BINDING_PREFIX}NAME`] = 'value'
+
+    const bindings = await getExtraBindings(extraBindingsRaw)
+
+    expect(bindings).toEqual(expected)
+  })
+
+  test('Environment bindings take precedence', async () => {
+    const expected = {"name": "value"}
+    const extraBindingsRaw: string = '{"name": "jsonvalue"}'
+    process.env[`${BINDING_PREFIX}NAME`] = 'value'
+
+    const bindings = await getExtraBindings(extraBindingsRaw)
+
+    expect(bindings).toEqual(expected)
   })
 })

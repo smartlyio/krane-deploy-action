@@ -19,7 +19,7 @@ async function run(): Promise<void> {
     const kraneTemplateDir: string = core.getInput('kubernetesTemplateDir')
     const kraneSelector: string = core.getInput('kraneSelector')
     const kranePath: string = core.getInput('kranePath')
-    const extraBindings: string = core.getInput('extraBindings')
+    const extraBindingsRaw: string = core.getInput('extraBindings')
     const renderOnly: boolean = toBoolean(core.getInput('renderOnly'))
     const deployTimeout: string = core.getInput('deployTimeout')
 
@@ -32,7 +32,7 @@ async function run(): Promise<void> {
       kraneTemplateDir,
       kraneSelector,
       kranePath,
-      extraBindings,
+      extraBindingsRaw,
       renderOnly,
       deployTimeout
     )
