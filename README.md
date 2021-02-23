@@ -6,7 +6,6 @@ This action deploys service to kubernetes cluster with [krane](https://github.co
 Requires kubectl and krane. Make sure krane is installed on your runner, only versions >= **1.1.0** are supported.
 
 ## Environment variables
-- `KUBERNETES_AUTH_TOKEN` - Bearer token for the user entry in kubeconfig
 - `KRANE_BINDING_*` - All variables of this pattern will be injected as bindings to `krane render`.  The binding name will be lower-case, with the `KRANE_BINDING_` prefix removed.
 
 ## Example usage
