@@ -3897,11 +3897,17 @@ function toBoolean(value) {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const currentSha = core.getInput('currentSha');
-            const dockerRegistry = core.getInput('dockerRegistry');
-            const kubernetesContext = core.getInput('kubernetesContext');
-            const kubernetesClusterDomain = core.getInput('kubernetesClusterDomain');
-            const kubernetesNamespace = core.getInput('kubernetesNamespace');
+            const currentSha = core.getInput('currentSha', { required: true });
+            const dockerRegistry = core.getInput('dockerRegistry', {
+                required: true
+            });
+            const kubernetesContext = core.getInput('kubernetesContext', {
+                required: true
+            });
+            const kubernetesClusterDomain = core.getInput('kubernetesClusterDomain', { required: true });
+            const kubernetesNamespace = core.getInput('kubernetesNamespace', {
+                required: true
+            });
             const kraneTemplateDir = core.getInput('kubernetesTemplateDir');
             const kraneSelector = core.getInput('kraneSelector');
             const kranePath = core.getInput('kranePath');

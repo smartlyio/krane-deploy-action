@@ -9,13 +9,20 @@ function toBoolean(value: string): boolean {
 
 async function run(): Promise<void> {
   try {
-    const currentSha: string = core.getInput('currentSha')
-    const dockerRegistry: string = core.getInput('dockerRegistry')
-    const kubernetesContext: string = core.getInput('kubernetesContext')
+    const currentSha: string = core.getInput('currentSha', {required: true})
+    const dockerRegistry: string = core.getInput('dockerRegistry', {
+      required: true
+    })
+    const kubernetesContext: string = core.getInput('kubernetesContext', {
+      required: true
+    })
     const kubernetesClusterDomain: string = core.getInput(
-      'kubernetesClusterDomain'
+      'kubernetesClusterDomain',
+      {required: true}
     )
-    const kubernetesNamespace: string = core.getInput('kubernetesNamespace')
+    const kubernetesNamespace: string = core.getInput('kubernetesNamespace', {
+      required: true
+    })
     const kraneTemplateDir: string = core.getInput('kubernetesTemplateDir')
     const kraneSelector: string = core.getInput('kraneSelector')
     const kranePath: string = core.getInput('kranePath')
