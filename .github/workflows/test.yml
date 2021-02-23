@@ -52,7 +52,7 @@ jobs:
       with:
         currentSha: ${{ github.sha }}
         dockerRegistry: testRegistry
-        kubernetesServer: testServer
+        kubernetesClusterDomain: cluster.example.com
         kubernetesContext: testContext
         kubernetesNamespace: testNamespace
         kubernetesTemplateDir: ./templates
@@ -70,7 +70,7 @@ jobs:
       with:
         currentSha: ${{ github.sha }}
         dockerRegistry: testRegistry
-        kubernetesServer: testServer
+        kubernetesClusterDomain: cluster.example.com
         kubernetesContext: testContext
         kubernetesNamespace: testNamespace
         kubernetesTemplateDir: ./templates
