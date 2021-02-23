@@ -47,6 +47,7 @@ jobs:
       uses: ./
       env:
         KUBERNETES_AUTH_TOKEN: test
+        KRANE_BINDING_binding2: value2
       with: 
         dockerRegistry: testRegistry
         kubernetesServer: testServer
@@ -55,10 +56,15 @@ jobs:
         kubernetesTemplateDir: ./templates
         kranePath: ./krane.sh
         renderOnly: true
+        extraBindings: |
+          {
+            "binding1": "value"
+          }
     - name: Test render and deploy
       uses: ./
       env:
         KUBERNETES_AUTH_TOKEN: test
+        KRANE_BINDING_binding2: value2
       with: 
         dockerRegistry: testRegistry
         kubernetesServer: testServer
@@ -67,3 +73,7 @@ jobs:
         kubernetesTemplateDir: ./templates
         kranePath: ./krane.sh
         deployTimeout: 30s
+        extraBindings: |
+          {
+            "binding1": "value"
+          }
