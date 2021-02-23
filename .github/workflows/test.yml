@@ -37,6 +37,7 @@ jobs:
     - run: |
         # Mock the krane executable
         echo '#!/usr/bin/env bash' > ./krane.sh
+        echo 'echo "$@"' >> ./krane.sh
         chmod u+x ./krane.sh
         # Make a dummy template directory
         mkdir ./templates
