@@ -3116,10 +3116,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getChangeCauseAnnotation = exports.formatDate = exports.addAnnotation = exports.addAnnotationToDocument = void 0;
 const yaml_1 = __importDefault(__webpack_require__(521));
 function addAnnotationToDocument(document, annotationName, annotationValue) {
-    const kind = document.get('kind').toLowerCase();
+    const kind = document.get('kind');
+    if (!kind) {
+        return;
+    }
     // change-cause (or rather, kubectl rollout history) is only valid
     // for deployments, daemonsets and statefulsets.
-    if (!['deployment', 'daemonset', 'statefulset'].includes(kind)) {
+    if (!['deployment', 'daemonset', 'statefulset'].includes(kind.toLowerCase())) {
         return;
     }
     if (!document.has('metadata')) {
