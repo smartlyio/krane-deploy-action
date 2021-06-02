@@ -46,8 +46,19 @@ ${updatedDocument}`
   return updatedManifests
 }
 
+function padInt(int: number, length: number): string {
+  return `000${int}`.slice(-length)
+}
+
 export function formatDate(date: Date): string {
-  return date.toISOString().replace('T', ' ').replace('Z', ' UTC')
+  const year = padInt(date.getUTCFullYear(), 4)
+  // Months are 0-based in Javascript?!?
+  const month = padInt(date.getUTCMonth() + 1, 2)
+  const day = padInt(date.getUTCDate(), 2)
+  const hour = padInt(date.getUTCHours(), 2)
+  const minute = padInt(date.getUTCMinutes(), 2)
+  const second = padInt(date.getUTCSeconds(), 2)
+  return `${year}-${month}-${day} ${hour}:${minute}:${second} UTC`
 }
 
 export function getChangeCauseAnnotation(
