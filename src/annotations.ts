@@ -1,6 +1,7 @@
 import YAML from 'yaml'
+import {YAMLMap} from 'yaml/types'
 
-function addAnnotationToDocument(
+export function addAnnotationToDocument(
   document: YAML.Document,
   annotationName: string,
   annotationValue: string
@@ -14,11 +15,11 @@ function addAnnotationToDocument(
   if (!document.has('metadata')) {
     document.set('metadata', YAML.createNode({}))
   }
-  const metadata: YAML.YamlMap = document.get('metadata')
+  const metadata: YAMLMap = document.get('metadata')
   if (!metadata.has('annotations')) {
     metadata.set('annotations', YAML.createNode({}))
   }
-  const annotations: YAML.YamlMap = metadata.get('annotations')
+  const annotations: YAMLMap = metadata.get('annotations')
   if (!annotations.has(annotationName)) {
     annotations.set(annotationName, annotationValue)
   }
