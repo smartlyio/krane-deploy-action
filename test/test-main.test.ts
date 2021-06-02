@@ -1,5 +1,7 @@
 jest.mock('../src/krane')
+jest.mock('../src/annotations')
 import {render, deploy} from '../src/krane'
+import {addAnnotation} from '../src/annotations'
 import {mocked} from 'ts-jest/utils'
 
 import {main, getExtraBindings, BINDING_PREFIX} from '../src/main'
@@ -31,6 +33,7 @@ describe('main entry point', () => {
     mocked(render).mockImplementation(async () => {
       return renderedTemplates
     })
+    mocked(addAnnotation).mockReturnValue(renderedTemplates)
 
     await main(
       currentSha,
@@ -76,6 +79,7 @@ describe('main entry point', () => {
     mocked(render).mockImplementation(async () => {
       return renderedTemplates
     })
+    mocked(addAnnotation).mockReturnValue(renderedTemplates)
 
     await main(
       currentSha,
@@ -122,6 +126,7 @@ describe('main entry point', () => {
     mocked(render).mockImplementation(async () => {
       return renderedTemplates
     })
+    mocked(addAnnotation).mockReturnValue(renderedTemplates)
 
     await main(
       currentSha,
