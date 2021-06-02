@@ -111,6 +111,10 @@ describe('getChangeCauseAnnotation', () => {
 })
 
 test('formatDate', () => {
-  expect(formatDate(new Date('2021-01-07T23:45:27.123Z'))).toEqual('2021-01-07 23:45:27 UTC')
-  expect(formatDate(new Date('2021-07-29T02:45:27.123Z'))).toEqual('2021-07-29 02:45:27 UTC')
+  expect(formatDate(new Date('2021-01-07T23:45:27.123Z'))).toEqual(
+    '2021-01-07 23:45:27 UTC'
+  )
+  expect(formatDate(new Date('2021-07-29T02:45:27.123Z'))).toEqual(
+    '2021-07-29 02:45:27 UTC'
+  )
 })
