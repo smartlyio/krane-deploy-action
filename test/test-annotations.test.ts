@@ -14,7 +14,6 @@ metadata:
     krane: "yes"
 `
 
-
 const DOCUMENT_STREAM = `
 ---
 ${BASIC_DOCUMENT}
@@ -48,13 +47,11 @@ describe('add annotation', () => {
   test('addAnnotation', () => {
     const annotation = 'annotation-name'
     const value = 'annotation-value'
-    const updatedDocuments = addAnnotation(
-      DOCUMENT_STREAM,
-      annotation,
-      value
-    )
+    const updatedDocuments = addAnnotation(DOCUMENT_STREAM, annotation, value)
 
-    const documents = YAML.parseAllDocuments(updatedDocuments).map((d) => d.toJSON())
+    const documents = YAML.parseAllDocuments(updatedDocuments).map(d =>
+      d.toJSON()
+    )
 
     const [deployment, service, daemonset] = documents
     expect('annotations' in service.metadata).toEqual(false)
@@ -74,7 +71,11 @@ describe('getChangeCauseAnnotation', () => {
       deployer: 'lego'
     }
     const changeCause = getChangeCauseAnnotation(currentSha, bindings, now)
-    expect(changeCause).toEqual(`type=krane,deployer=lego,revision=abc123,at=${formatDate(now)},annotated-automatically=true`)
+    expect(changeCause).toEqual(
+      `type=krane,deployer=lego,revision=abc123,at=${formatDate(
+        now
+      )},annotated-automatically=true`
+    )
   })
 
   test('different deploy_revision specified', () => {
@@ -85,6 +86,10 @@ describe('getChangeCauseAnnotation', () => {
       deploy_revision: '456def'
     }
     const changeCause = getChangeCauseAnnotation(currentSha, bindings, now)
-    expect(changeCause).toEqual(`type=krane,deployer=lego,revision=456def,at=${formatDate(now)},annotated-automatically=true`)
+    expect(changeCause).toEqual(
+      `type=krane,deployer=lego,revision=456def,at=${formatDate(
+        now
+      )},annotated-automatically=true`
+    )
   })
-});
+})
