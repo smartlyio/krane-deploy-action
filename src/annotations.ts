@@ -6,10 +6,15 @@ export function addAnnotationToDocument(
   annotationName: string,
   annotationValue: string
 ): void {
-  const kind = document.get('kind').toLowerCase()
+  const kind = document.get('kind')
+  if (!kind) {
+    return
+  }
   // change-cause (or rather, kubectl rollout history) is only valid
   // for deployments, daemonsets and statefulsets.
-  if (!['deployment', 'daemonset', 'statefulset'].includes(kind)) {
+  if (
+    !['deployment', 'daemonset', 'statefulset'].includes(kind.toLowerCase())
+  ) {
     return
   }
   if (!document.has('metadata')) {

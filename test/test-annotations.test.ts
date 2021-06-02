@@ -14,6 +14,13 @@ metadata:
     krane: "yes"
 `
 
+const INVALID_DOCUMENT = `
+metadata:
+  name: test-deployment
+  labels:
+    krane: "yes"
+`
+
 const DOCUMENT_STREAM = `
 ---
 ${BASIC_DOCUMENT}
@@ -42,6 +49,15 @@ describe('add annotation', () => {
     const annotations = document.get('metadata').get('annotations')
     expect(annotations.has(annotation)).toEqual(true)
     expect(annotations.get(annotation)).toEqual(value)
+  })
+
+  test('addAnnotationToDocument without kind', () => {
+    const document: YAML.Document = YAML.parseDocument(INVALID_DOCUMENT)
+    const annotation = 'annotation-name'
+    const value = 'annotation-value'
+    addAnnotationToDocument(document, annotation, value)
+
+    expect(document.get('metadata').has('annotations')).toEqual(false)
   })
 
   test('addAnnotation', () => {
