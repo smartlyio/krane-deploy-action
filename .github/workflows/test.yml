@@ -41,8 +41,8 @@ jobs:
         chmod u+x ./krane.sh
         # Make a dummy template directory
         mkdir ./templates
-        touch ./templates/manifest.yml
-        touch ./templates/template.yml.erb
+        echo 'kind: Service' > ./templates/manifest.yml
+        echo 'kind: Deployment' > ./templates/template.yml.erb
         touch ./templates/secrets.ejson
     - name: Test rendering only
       uses: ./
@@ -59,7 +59,7 @@ jobs:
         renderOnly: true
         extraBindings: |
           {
-            "binding1": "value"
+            "deployer": "user"
           }
     - name: Test render and deploy
       uses: ./
@@ -76,5 +76,5 @@ jobs:
         deployTimeout: 30s
         extraBindings: |
           {
-            "binding1": "value"
+            "deployer": "user"
           }
