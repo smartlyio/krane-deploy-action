@@ -3150,8 +3150,18 @@ ${updatedDocument}`;
     return updatedManifests;
 }
 exports.addAnnotation = addAnnotation;
+function padInt(int, length) {
+    return `000${int}`.slice(-length);
+}
 function formatDate(date) {
-    return date.toISOString().replace('T', ' ').replace('Z', ' UTC');
+    const year = padInt(date.getUTCFullYear(), 4);
+    // Months are 0-based in Javascript?!?
+    const month = padInt(date.getUTCMonth() + 1, 2);
+    const day = padInt(date.getUTCDate(), 2);
+    const hour = padInt(date.getUTCHours(), 2);
+    const minute = padInt(date.getUTCMinutes(), 2);
+    const second = padInt(date.getUTCSeconds(), 2);
+    return `${year}-${month}-${day} ${hour}:${minute}:${second} UTC`;
 }
 exports.formatDate = formatDate;
 function getChangeCauseAnnotation(currentSha, bindings, now) {
@@ -3164,7 +3174,7 @@ function getChangeCauseAnnotation(currentSha, bindings, now) {
         : currentSha;
     parts.push(`revision=${revision}`);
     // Quick and dirty date format similar to what ruby produces with Time.now.getutc
-    const nowUtc = now.toISOString().replace('T', ' ').replace('Z', ' UTC');
+    const nowUtc = formatDate(now);
     parts.push(`at=${nowUtc}`);
     parts.push('annotated-automatically=true');
     return parts.join(',');
