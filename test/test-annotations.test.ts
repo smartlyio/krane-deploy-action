@@ -2,7 +2,8 @@ import YAML from 'yaml'
 import {
   addAnnotation,
   addAnnotationToDocument,
-  getChangeCauseAnnotation
+  getChangeCauseAnnotation,
+  formatDate
 } from '../src/annotations'
 
 const BASIC_DOCUMENT = `
@@ -64,3 +65,26 @@ describe('add annotation', () => {
     })
   })
 })
+
+describe('getChangeCauseAnnotation', () => {
+  test('no deploy revision specified', () => {
+    const now = new Date()
+    const currentSha = 'abc123'
+    const bindings: Record<string, string> = {
+      deployer: 'lego'
+    }
+    const changeCause = getChangeCauseAnnotation(currentSha, bindings, now)
+    expect(changeCause).toEqual(`type=krane,deployer=lego,revision=abc123,at=${formatDate(now)},annotated-automatically=true`)
+  })
+
+  test('different deploy_revision specified', () => {
+    const now = new Date()
+    const currentSha = 'abc123'
+    const bindings: Record<string, string> = {
+      deployer: 'lego',
+      deploy_revision: '456def'
+    }
+    const changeCause = getChangeCauseAnnotation(currentSha, bindings, now)
+    expect(changeCause).toEqual(`type=krane,deployer=lego,revision=456def,at=${formatDate(now)},annotated-automatically=true`)
+  })
+});

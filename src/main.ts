@@ -77,7 +77,8 @@ export async function main(
 
   const automaticChangeCauseAnnotation = getChangeCauseAnnotation(
     currentSha,
-    extraBindings
+    extraBindings,
+    new Date()
   )
   const annotatedTemplates = addAnnotation(
     renderedTemplates,

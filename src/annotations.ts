@@ -41,9 +41,14 @@ ${updatedDocument}`
   return updatedManifests
 }
 
+export function formatDate(date: Date): string {
+  return date.toISOString().replace('T', ' ').replace('Z', ' UTC')
+}
+
 export function getChangeCauseAnnotation(
   currentSha: string,
-  bindings: Record<string, string>
+  bindings: Record<string, string>,
+  now: Date
 ): string {
   const parts = ['type=krane']
   if (bindings.deployer) {
@@ -54,8 +59,8 @@ export function getChangeCauseAnnotation(
     : currentSha
   parts.push(`revision=${revision}`)
   // Quick and dirty date format similar to what ruby produces with Time.now.getutc
-  const now = new Date().toISOString().replace('T', ' ').replace('Z', ' UTC')
-  parts.push(`at=${now}`)
+  const nowUtc = now.toISOString().replace('T', ' ').replace('Z', ' UTC')
+  parts.push(`at=${nowUtc}`)
   parts.push('annotated-automatically=true')
   return parts.join(',')
 }
