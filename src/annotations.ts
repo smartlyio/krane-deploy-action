@@ -64,7 +64,7 @@ export function getChangeCauseAnnotation(
     : currentSha
   parts.push(`revision=${revision}`)
   // Quick and dirty date format similar to what ruby produces with Time.now.getutc
-  const nowUtc = now.toISOString().replace('T', ' ').replace('Z', ' UTC')
+  const nowUtc = formatDate(now)
   parts.push(`at=${nowUtc}`)
   parts.push('annotated-automatically=true')
   return parts.join(',')
