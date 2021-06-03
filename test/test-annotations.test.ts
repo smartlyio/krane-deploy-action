@@ -1,5 +1,6 @@
-import YAML from 'yaml'
+import yaml from 'js-yaml'
 import {
+  KubeManifest,
   addAnnotation,
   addAnnotationToDocument,
   getChangeCauseAnnotation,
@@ -21,9 +22,24 @@ metadata:
     krane: "yes"
 `
 
+const MERGE_KEYS = `
+kind: Deployment
+metadata:
+  name: test-deployment
+  labels:
+    krane: "yes"
+fakeTestStuff:
+  <<: [{"item1": "value"}, {"item2": "another"}]
+  <<: {"item3": "more value"}
+  regular-key: new value
+`
+
 const DOCUMENT_STREAM = `
 ---
 ${BASIC_DOCUMENT}
+---
+---
+invalidDocument
 ---
 kind: Service
 metadata:
@@ -40,41 +56,62 @@ metadata:
 
 describe('add annotation', () => {
   test('addAnnotationToDocument', () => {
-    const document: YAML.Document = YAML.parseDocument(BASIC_DOCUMENT)
+    const document: KubeManifest = yaml.load(BASIC_DOCUMENT) as KubeManifest
     const annotation = 'annotation-name'
     const value = 'annotation-value'
-    addAnnotationToDocument(document, annotation, value)
+    const newDocument = addAnnotationToDocument(document, annotation, value)
 
-    expect(document.get('metadata').has('annotations')).toEqual(true)
-    const annotations = document.get('metadata').get('annotations')
-    expect(annotations.has(annotation)).toEqual(true)
-    expect(annotations.get(annotation)).toEqual(value)
+    expect(newDocument?.metadata?.annotations).toEqual({[annotation]: value})
   })
 
   test('addAnnotationToDocument without kind', () => {
-    const document: YAML.Document = YAML.parseDocument(INVALID_DOCUMENT)
+    const document: KubeManifest = yaml.load(INVALID_DOCUMENT) as KubeManifest
     const annotation = 'annotation-name'
     const value = 'annotation-value'
-    addAnnotationToDocument(document, annotation, value)
+    const newDocument = addAnnotationToDocument(document, annotation, value)
 
-    expect(document.get('metadata').has('annotations')).toEqual(false)
+    expect(document).toEqual(newDocument)
   })
 
-  test('addAnnotation', () => {
-    const annotation = 'annotation-name'
-    const value = 'annotation-value'
-    const updatedDocuments = addAnnotation(DOCUMENT_STREAM, annotation, value)
+  describe('addAnnotation', () => {
+    test('basic document stream', () => {
+      const annotation = 'annotation-name'
+      const value = 'annotation-value'
+      // We have one empty (null) document
+      expect(yaml.loadAll(DOCUMENT_STREAM).length).toEqual(5)
 
-    const documents = YAML.parseAllDocuments(updatedDocuments).map(d =>
-      d.toJSON()
-    )
+      const updatedDocuments = addAnnotation(DOCUMENT_STREAM, annotation, value)
 
-    const [deployment, service, daemonset] = documents
-    expect('annotations' in service.metadata).toEqual(false)
-    expect(deployment.metadata.annotations).toEqual({[annotation]: value})
-    expect(daemonset.metadata.annotations).toEqual({
-      [annotation]: value,
-      colour: 'blue'
+      const documents = yaml.loadAll(updatedDocuments) as KubeManifest[]
+
+      // Empty (null) document is dropped
+      expect(documents.length).toEqual(4)
+      const [deployment, invalid, service, daemonset] = documents
+      expect(invalid).toEqual('invalidDocument')
+      expect(service?.metadata?.annotations).toEqual(undefined)
+      expect(deployment?.metadata?.annotations).toEqual({[annotation]: value})
+      expect(daemonset?.metadata?.annotations).toEqual({
+        [annotation]: value,
+        colour: 'blue'
+      })
+    })
+
+    test('document with yaml merge keys <<:', () => {
+      const annotation = 'annotation-name'
+      const value = 'annotation-value'
+      const updatedDocuments = addAnnotation(MERGE_KEYS, annotation, value)
+
+      const documents = yaml.loadAll(updatedDocuments) as KubeManifest[]
+
+      expect(documents.length).toEqual(1)
+      const [deployment] = documents
+      expect(deployment?.metadata?.annotations).toEqual({[annotation]: value})
+      expect(deployment?.fakeTestStuff).toEqual({
+        item1: 'value',
+        item2: 'another',
+        item3: 'more value',
+        'regular-key': 'new value'
+      })
     })
   })
 })
