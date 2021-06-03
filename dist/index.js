@@ -1834,10 +1834,12 @@ function addAnnotation(manifestStream, annotationName, annotationValue) {
     const yamlDocuments = js_yaml_1.default.loadAll(manifestStream);
     let updatedManifests = '';
     for (const document of yamlDocuments) {
-        const newDocument = addAnnotationToDocument(document, annotationName, annotationValue);
-        const updatedDocument = js_yaml_1.default.dump(newDocument, { lineWidth: -1 });
-        updatedManifests = `${updatedManifests}---
+        if (document) {
+            const newDocument = addAnnotationToDocument(document, annotationName, annotationValue);
+            const updatedDocument = js_yaml_1.default.dump(newDocument, { lineWidth: -1 });
+            updatedManifests = `${updatedManifests}---
 ${updatedDocument}`;
+        }
     }
     return updatedManifests;
 }
