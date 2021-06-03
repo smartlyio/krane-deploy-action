@@ -67,14 +67,16 @@ export function addAnnotation(
   const yamlDocuments = yaml.loadAll(manifestStream) as KubeManifest[]
   let updatedManifests = ''
   for (const document of yamlDocuments) {
-    const newDocument = addAnnotationToDocument(
-      document,
-      annotationName,
-      annotationValue
-    )
-    const updatedDocument: string = yaml.dump(newDocument, {lineWidth: -1})
-    updatedManifests = `${updatedManifests}---
+    if (document) {
+      const newDocument = addAnnotationToDocument(
+        document,
+        annotationName,
+        annotationValue
+      )
+      const updatedDocument: string = yaml.dump(newDocument, {lineWidth: -1})
+      updatedManifests = `${updatedManifests}---
 ${updatedDocument}`
+    }
   }
   return updatedManifests
 }
