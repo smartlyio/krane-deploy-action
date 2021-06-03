@@ -31,6 +31,7 @@ metadata:
 fakeTestStuff:
   <<: [{"item1": "value"}, {"item2": "another"}]
   <<: {"item3": "more value"}
+  regular-key: new value
 `
 
 const DOCUMENT_STREAM = `
@@ -108,7 +109,8 @@ describe('add annotation', () => {
       expect(deployment?.fakeTestStuff).toEqual({
         item1: 'value',
         item2: 'another',
-        item3: 'more value'
+        item3: 'more value',
+        'regular-key': 'new value'
       })
     })
   })
