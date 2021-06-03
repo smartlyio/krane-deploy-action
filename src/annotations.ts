@@ -1,33 +1,62 @@
-import YAML from 'yaml'
-import {YAMLMap} from 'yaml/types'
+import yaml from 'js-yaml'
+
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+interface KubeAnnotations {
+  readonly [propname: string]: string
+}
+
+interface KubeMetadata {
+  readonly annotations?: KubeAnnotations
+  readonly [propname: string]: any
+}
+
+export interface KubeManifest {
+  readonly kind?: string
+  readonly metadata?: KubeMetadata
+  readonly [propname: string]: any
+}
+/* eslint-enable  @typescript-eslint/no-explicit-any */
 
 export function addAnnotationToDocument(
-  document: YAML.Document,
+  document: KubeManifest,
   annotationName: string,
   annotationValue: string
-): void {
-  const kind = document.get('kind')
-  if (!kind) {
-    return
+): KubeManifest {
+  if (!document.kind) {
+    return document
   }
   // change-cause (or rather, kubectl rollout history) is only valid
   // for deployments, daemonsets and statefulsets.
   if (
-    !['deployment', 'daemonset', 'statefulset'].includes(kind.toLowerCase())
+    !['deployment', 'daemonset', 'statefulset'].includes(
+      document.kind.toLowerCase()
+    )
   ) {
-    return
+    return document
   }
-  if (!document.has('metadata')) {
-    document.set('metadata', YAML.createNode({}))
+
+  let metadata: KubeMetadata = {}
+  let annotations: KubeAnnotations = {}
+  if (document.metadata) {
+    metadata = {...document.metadata}
   }
-  const metadata: YAMLMap = document.get('metadata')
-  if (!metadata.has('annotations')) {
-    metadata.set('annotations', YAML.createNode({}))
+  if (metadata.annotations) {
+    annotations = {...metadata.annotations}
   }
-  const annotations: YAMLMap = metadata.get('annotations')
-  if (!annotations.has(annotationName)) {
-    annotations.set(annotationName, annotationValue)
+  if (annotationName in annotations) {
+    return document
   }
+  const newDocument: KubeManifest = {
+    ...document,
+    metadata: {
+      ...metadata,
+      annotations: {
+        ...annotations,
+        [annotationName]: annotationValue
+      }
+    }
+  }
+  return newDocument
 }
 
 export function addAnnotation(
@@ -35,11 +64,15 @@ export function addAnnotation(
   annotationName: string,
   annotationValue: string
 ): string {
-  const yamlDocuments = YAML.parseAllDocuments(manifestStream)
+  const yamlDocuments = yaml.loadAll(manifestStream) as KubeManifest[]
   let updatedManifests = ''
   for (const document of yamlDocuments) {
-    addAnnotationToDocument(document, annotationName, annotationValue)
-    const updatedDocument: string = YAML.stringify(document)
+    const newDocument = addAnnotationToDocument(
+      document,
+      annotationName,
+      annotationValue
+    )
+    const updatedDocument: string = yaml.dump(newDocument, {lineWidth: -1})
     updatedManifests = `${updatedManifests}---
 ${updatedDocument}`
   }

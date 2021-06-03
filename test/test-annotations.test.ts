@@ -1,5 +1,6 @@
-import YAML from 'yaml'
+import yaml from 'js-yaml'
 import {
+  KubeManifest,
   addAnnotation,
   addAnnotationToDocument,
   getChangeCauseAnnotation,
@@ -40,24 +41,21 @@ metadata:
 
 describe('add annotation', () => {
   test('addAnnotationToDocument', () => {
-    const document: YAML.Document = YAML.parseDocument(BASIC_DOCUMENT)
+    const document: KubeManifest = yaml.load(BASIC_DOCUMENT) as KubeManifest
     const annotation = 'annotation-name'
     const value = 'annotation-value'
-    addAnnotationToDocument(document, annotation, value)
+    const newDocument = addAnnotationToDocument(document, annotation, value)
 
-    expect(document.get('metadata').has('annotations')).toEqual(true)
-    const annotations = document.get('metadata').get('annotations')
-    expect(annotations.has(annotation)).toEqual(true)
-    expect(annotations.get(annotation)).toEqual(value)
+    expect(newDocument?.metadata?.annotations).toEqual({[annotation]: value})
   })
 
   test('addAnnotationToDocument without kind', () => {
-    const document: YAML.Document = YAML.parseDocument(INVALID_DOCUMENT)
+    const document: KubeManifest = yaml.load(INVALID_DOCUMENT) as KubeManifest
     const annotation = 'annotation-name'
     const value = 'annotation-value'
-    addAnnotationToDocument(document, annotation, value)
+    const newDocument = addAnnotationToDocument(document, annotation, value)
 
-    expect(document.get('metadata').has('annotations')).toEqual(false)
+    expect(document).toEqual(newDocument)
   })
 
   test('addAnnotation', () => {
@@ -65,14 +63,12 @@ describe('add annotation', () => {
     const value = 'annotation-value'
     const updatedDocuments = addAnnotation(DOCUMENT_STREAM, annotation, value)
 
-    const documents = YAML.parseAllDocuments(updatedDocuments).map(d =>
-      d.toJSON()
-    )
+    const documents = yaml.loadAll(updatedDocuments) as KubeManifest[]
 
     const [deployment, service, daemonset] = documents
-    expect('annotations' in service.metadata).toEqual(false)
-    expect(deployment.metadata.annotations).toEqual({[annotation]: value})
-    expect(daemonset.metadata.annotations).toEqual({
+    expect(service?.metadata?.annotations).toEqual(undefined)
+    expect(deployment?.metadata?.annotations).toEqual({[annotation]: value})
+    expect(daemonset?.metadata?.annotations).toEqual({
       [annotation]: value,
       colour: 'blue'
     })
