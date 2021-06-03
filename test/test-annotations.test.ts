@@ -106,9 +106,9 @@ describe('add annotation', () => {
       const [deployment] = documents
       expect(deployment?.metadata?.annotations).toEqual({[annotation]: value})
       expect(deployment?.fakeTestStuff).toEqual({
-        item1: "value",
-        item2: "another",
-        item3: "more value"
+        item1: 'value',
+        item2: 'another',
+        item3: 'more value'
       })
     })
   })
