@@ -27,6 +27,8 @@ const DOCUMENT_STREAM = `
 ${BASIC_DOCUMENT}
 ---
 ---
+invalidDocument
+---
 kind: Service
 metadata:
   name: a-service
@@ -63,15 +65,16 @@ describe('add annotation', () => {
     const annotation = 'annotation-name'
     const value = 'annotation-value'
     // We have one empty (null) document
-    expect(yaml.loadAll(DOCUMENT_STREAM).length).toEqual(4)
+    expect(yaml.loadAll(DOCUMENT_STREAM).length).toEqual(5)
 
     const updatedDocuments = addAnnotation(DOCUMENT_STREAM, annotation, value)
 
     const documents = yaml.loadAll(updatedDocuments) as KubeManifest[]
 
     // Empty (null) document is dropped
-    expect(documents.length).toEqual(3)
-    const [deployment, service, daemonset] = documents
+    expect(documents.length).toEqual(4)
+    const [deployment, invalid, service, daemonset] = documents
+    expect(invalid).toEqual('invalidDocument')
     expect(service?.metadata?.annotations).toEqual(undefined)
     expect(deployment?.metadata?.annotations).toEqual({[annotation]: value})
     expect(daemonset?.metadata?.annotations).toEqual({
