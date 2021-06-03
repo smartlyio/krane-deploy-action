@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import {render, deploy} from './krane'
+import {getChangeCauseAnnotation, addAnnotation} from './annotations'
 import Ajv from 'ajv'
 
 const ajv = new Ajv({allErrors: true})
@@ -14,6 +15,7 @@ const validate = ajv.compile({
 })
 
 export const BINDING_PREFIX = 'KRANE_BINDING_'
+export const CHANGE_CAUSE = 'kubernetes.io/change-cause'
 
 export async function getExtraBindings(
   extraBindingsRaw: string
@@ -73,6 +75,17 @@ export async function main(
     extraBindings
   )
 
+  const automaticChangeCauseAnnotation = getChangeCauseAnnotation(
+    currentSha,
+    extraBindings,
+    new Date()
+  )
+  const annotatedTemplates = addAnnotation(
+    renderedTemplates,
+    CHANGE_CAUSE,
+    automaticChangeCauseAnnotation
+  )
+
   if (renderOnly) {
     return
   }
@@ -83,7 +96,7 @@ export async function main(
     kubernetesNamespace,
     kraneSelector,
     kraneTemplateDir,
-    renderedTemplates,
+    annotatedTemplates,
     deployTimeout
   )
 }
