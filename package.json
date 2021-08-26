@@ -27,9 +27,9 @@
   "dependencies": {
     "@actions/core": "1.2.6",
     "@actions/exec": "1.0.4",
-    "@types/js-yaml": "4.0.1",
+    "@types/js-yaml": "4.0.3",
     "ajv": "6.12.6",
-    "js-yaml": "3.14.1"
+    "js-yaml": "4.1.0"
   },
   "devDependencies": {
     "@actions/io": "1.0.2",
