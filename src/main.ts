@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
-import {render, deploy} from './krane'
-import {getChangeCauseAnnotation, addAnnotation} from './annotations'
+import {addAnnotation, getChangeCauseAnnotation} from './annotations'
+import {deploy, render} from './krane'
 import Ajv from 'ajv'
 
 const ajv = new Ajv({allErrors: true})
