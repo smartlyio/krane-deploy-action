@@ -3823,13 +3823,13 @@ exports.getExtraBindings = getExtraBindings;
 function main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDomain, kubernetesNamespace, kraneTemplateDir, kraneSelector, kranePath, extraBindingsRaw, renderOnly, deployTimeout) {
     return __awaiter(this, void 0, void 0, function* () {
         const extraBindings = yield getExtraBindings(extraBindingsRaw);
-        const renderedTemplates = yield krane_1.render(kranePath, currentSha, dockerRegistry, kubernetesClusterDomain, kraneTemplateDir, extraBindings);
-        const automaticChangeCauseAnnotation = annotations_1.getChangeCauseAnnotation(currentSha, extraBindings, new Date());
-        const annotatedTemplates = annotations_1.addAnnotation(renderedTemplates, exports.CHANGE_CAUSE, automaticChangeCauseAnnotation);
+        const renderedTemplates = yield (0, krane_1.render)(kranePath, currentSha, dockerRegistry, kubernetesClusterDomain, kraneTemplateDir, extraBindings);
+        const automaticChangeCauseAnnotation = (0, annotations_1.getChangeCauseAnnotation)(currentSha, extraBindings, new Date());
+        const annotatedTemplates = (0, annotations_1.addAnnotation)(renderedTemplates, exports.CHANGE_CAUSE, automaticChangeCauseAnnotation);
         if (renderOnly) {
             return;
         }
-        yield krane_1.deploy(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, annotatedTemplates, deployTimeout);
+        yield (0, krane_1.deploy)(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, annotatedTemplates, deployTimeout);
     });
 }
 exports.main = main;
@@ -8470,10 +8470,10 @@ function run() {
             const extraBindingsRaw = core.getInput('extraBindings');
             const renderOnly = toBoolean(core.getInput('renderOnly'));
             const deployTimeout = core.getInput('deployTimeout');
-            yield main_1.main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDomain, kubernetesNamespace, kraneTemplateDir, kraneSelector, kranePath, extraBindingsRaw, renderOnly, deployTimeout);
+            yield (0, main_1.main)(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDomain, kubernetesNamespace, kraneTemplateDir, kraneSelector, kranePath, extraBindingsRaw, renderOnly, deployTimeout);
         }
         catch (error) {
-            core.setFailed(error.message);
+            core.setFailed(`${error}`);
         }
     });
 }
@@ -8882,7 +8882,7 @@ const fs = __importStar(__webpack_require__(747));
 const util_1 = __webpack_require__(669);
 class InvalidBindings extends Error {
 }
-const readdir = util_1.promisify(fs.readdir);
+const readdir = (0, util_1.promisify)(fs.readdir);
 function validateBindings(bindings) {
     const bindingNames = Object.keys(bindings);
     for (const key of bindingNames) {

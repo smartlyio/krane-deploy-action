@@ -44,7 +44,7 @@ async function run(): Promise<void> {
       deployTimeout
     )
   } catch (error) {
-    core.setFailed(error.message)
+    core.setFailed(`${error}`)
   }
 }
 
