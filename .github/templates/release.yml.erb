@@ -17,31 +17,24 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: build for release
-        id: build
-        run: |
-          npm run install
-          npm run version
-          git clean -fXd
-          git_changes="$(git status --porcelain -- dist || true)"
-            git stash save "Stash to allow npm version to run"
-            echo ::set-output name=has_changes::true
-          else
-            echo ::set-output name=has_changes::false
-          fi
       @import smartlyio/steps/util/get_next_semantic_version
       @import smartlyio/steps/util/check_branch_behind (is_base_ref: true, remote_update: true)
       - name: Create release
         if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='true'
         run: |
+          npm install
           npm version ${{ steps.version_check.outputs.version }}
           git push && git push --tags
-      - name: Commit changes without tag
-        if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='false' && steps.build.outputs.has_changes=='true'
+      - name: Update action without release
+        if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='false'
         run: |
-          git stash pop
-          git commit -m "Update compiled action"
-          git push
+          npm install
+          npm run version
+          git_changes="$(git status --porcelain -- dist || true)"
+            git add -- dist
+            git commit -m "Update compiled action"
+            git push
+          fi
       - name: Update release branch
         if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='true'
         run: |
