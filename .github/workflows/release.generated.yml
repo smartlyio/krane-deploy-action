@@ -101,6 +101,7 @@ jobs:
           npm run all
           git_changes="$(git status --porcelain -- dist || true)"
             git add dist
+            git commit -m "Update compiled action"
             echo ::set-output name=has_changes::true
           else
             echo ::set-output name=has_changes::false
@@ -182,7 +183,6 @@ jobs:
       - name: Commit changes without tag
         if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='false' && steps.build.outputs.has_changes=='true'
         run: |
-          git commit -m "Update compiled action"
           git push
       - name: Update release branch
         if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='true'
