@@ -1,39 +1,49 @@
-name: "build-test"
-on: # rebuild any PRs and main branch changes
+# IMPORTANT NOTE/WARNING!
+# Do not make changes to this file, your changes will be overwritten.
+#
+# This file is automagically generated from:
+# - .github/templates/pull_request.yml.erb
+# - Templates contained in the smartlyio/github-actions-templates repository
+#
+# This file can be updated by editing the template file, and running `devbox render workflows`
+
+name: "Pull Request"
+
+on:
   pull_request:
-  push:
-    branches:
-      - master
-      - 'releases/*'
+    branches: [master]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
     - name: "Install"
       run: |
         npm install
-    - name: "Run build"
+    - name: "Prettier"
       run: |
-        npm run all
-    - name: "Run tests"
+        npm run format-check
+    - name: "Lint"
+      run: |
+        npm run lint
+    - name: "Test"
       run: |
         npm run test
-    - name: "Verify artefacts are up to date in the repository"
+    - name: "build"
       run: |
-        git status || true
-        git diff || true
-        # Error if there are changes after the build
-        if [ "$(git status --porcelain | wc -c)" -gt "0" ]; then
-            echo "Built artefacts (dist/*) were not updated by the pull request."
-            echo "Run \`npm run-script package\` and commit the changes."
-            exit 1
-        fi
-  test: # make sure the action works on a clean machine without building
-    runs-on: ubuntu-latest
+        npm run build
+        npm run pack
+
+  test:
+    runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
+    - name: "Build action for test"
+      run: |
+        npm install
+        npm run all
+        git clean -fXd
     - run: |
         # Mock the krane executable
         echo '#!/usr/bin/env bash' > ./krane.sh

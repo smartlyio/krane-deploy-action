@@ -1,6 +1,6 @@
 {
   "name": "krane-deploy-action",
-  "version": "0.0.0",
+  "version": "4.3.0",
   "private": true,
   "description": "A github action to deploy services to kubernetes with https://github.com/Shopify/krane",
   "main": "lib/index.js",
@@ -11,18 +11,20 @@
     "lint": "eslint src/**/*.ts",
     "pack": "ncc build",
     "test": "jest",
-    "all": "npm run format-check && npm run build && npm run lint && npm run pack"
+    "all": "npm run format-check && npm run build && npm run lint && npm run pack",
+    "version": "npm run build && npm run pack && git add -- dist"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/smartlyio/krane-deploy-action.git"
   },
   "keywords": [
     "actions",
-    "node",
-    "setup"
+    "kubernetes",
+    "deploy",
+    "krane"
   ],
-  "author": "YourNameOrOrganization",
+  "author": "Smartly.io",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "1.5.0",
