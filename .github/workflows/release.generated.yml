@@ -163,9 +163,9 @@ jobs:
       - name: Check if at head of branch
         id: check_branch_behind
         run: |
-          git fetch --depth=1 origin ${{ github.head_ref }}
-          local=${{ github.event.pull_request.head.sha }}
-          remote=$(git rev-parse origin/${{ github.head_ref }})
+          git remote update
+          local=${{ github.sha }}
+          remote=$(git rev-parse origin/master)
           echo "$remote"
           if [ "$local" == "$remote" ]; then
             echo "Looks like we're at the head of the branch."
