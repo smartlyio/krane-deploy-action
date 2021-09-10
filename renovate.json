@@ -7,5 +7,6 @@
   },
   "vulnerabilityAlerts": {
     "enabled": true
-  }
+  },
+  "labels": ["renovate-deps", "no release"]
 }
