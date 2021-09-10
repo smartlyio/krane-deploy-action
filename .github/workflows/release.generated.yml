@@ -169,14 +169,14 @@ jobs:
       - name: Create release
         if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='true'
         run: |
+          npm install
           npm version ${{ steps.version_check.outputs.version }}
           git push && git push --tags
       - name: Update action without release
         if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='false'
         run: |
-          npm run install
+          npm install
           npm run version
-          git clean -fXd
           git_changes="$(git status --porcelain -- dist || true)"
             git add -- dist
             git commit -m "Update compiled action"
