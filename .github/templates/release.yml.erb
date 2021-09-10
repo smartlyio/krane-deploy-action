@@ -20,7 +20,9 @@ jobs:
       - name: build for release
         id: build
         run: |
+          npm run install
           npm run version
+          git clean -fXd
           git_changes="$(git status --porcelain -- dist || true)"
             git stash save "Stash to allow npm version to run"
             echo ::set-output name=has_changes::true

@@ -41,7 +41,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: "Build action for test"
       run: |
+        npm install
         npm run all
+        git clean -fXd
     - run: |
         # Mock the krane executable
         echo '#!/usr/bin/env bash' > ./krane.sh
