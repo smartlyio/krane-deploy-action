@@ -167,13 +167,13 @@ jobs:
             echo ::set-output name=BRANCH_UP_TO_DATE::false
           fi
       - name: Create release
-        if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='true'
+        if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE == 'true' && steps.version_check.continue_release == 'true'
         run: |
           npm install
           npm version ${{ steps.version_check.outputs.version }}
           git push && git push --tags
       - name: Update action without release
-        if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='false'
+        if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE == 'true' && steps.version_check.continue_release == 'false'
         run: |
           npm install
           npm run version
@@ -183,7 +183,7 @@ jobs:
             git push
           fi
       - name: Update release branch
-        if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='true'
+        if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE == 'true' && steps.version_check.continue_release == 'true'
         run: |
           package_version="$(jq -r .version < package.json)"
           release_branch="v${package_version//.*/}"
