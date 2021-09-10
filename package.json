@@ -15,14 +15,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/smartlyio/krane-deploy-action.git"
   },
   "keywords": [
     "actions",
-    "node",
-    "setup"
+    "kubernetes",
+    "deploy",
+    "krane"
   ],
-  "author": "YourNameOrOrganization",
+  "author": "Smartly.io",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "1.5.0",
