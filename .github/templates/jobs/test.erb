@@ -1,0 +1,51 @@
+test:
+  runs-on: <%= ubuntu_version %>
+  steps:
+  - uses: actions/checkout@v2
+  - name: "Build action for test"
+    run: |
+      npm run all
+  - run: |
+      # Mock the krane executable
+      echo '#!/usr/bin/env bash' > ./krane.sh
+      echo 'echo "$@"' >> ./krane.sh
+      chmod u+x ./krane.sh
+      # Make a dummy template directory
+      mkdir ./templates
+      echo 'kind: Service' > ./templates/manifest.yml
+      echo 'kind: Deployment' > ./templates/template.yml.erb
+      touch ./templates/secrets.ejson
+  - name: Test rendering only
+    uses: ./
+    env:
+      KRANE_BINDING_binding2: value2
+    with:
+      currentSha: ${{ github.sha }}
+      dockerRegistry: testRegistry
+      kubernetesClusterDomain: cluster.example.com
+      kubernetesContext: testContext
+      kubernetesNamespace: testNamespace
+      kubernetesTemplateDir: ./templates
+      kranePath: ./krane.sh
+      renderOnly: true
+      extraBindings: |
+        {
+          "deployer": "user"
+        }
+  - name: Test render and deploy
+    uses: ./
+    env:
+      KRANE_BINDING_binding2: value2
+    with:
+      currentSha: ${{ github.sha }}
+      dockerRegistry: testRegistry
+      kubernetesClusterDomain: cluster.example.com
+      kubernetesContext: testContext
+      kubernetesNamespace: testNamespace
+      kubernetesTemplateDir: ./templates
+      kranePath: ./krane.sh
+      deployTimeout: 30s
+      extraBindings: |
+        {
+          "deployer": "user"
+        }
