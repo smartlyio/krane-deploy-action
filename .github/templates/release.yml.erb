@@ -29,18 +29,16 @@ jobs:
           fi
       @import smartlyio/steps/util/get_next_semantic_version
       @import smartlyio/steps/util/check_branch_behind
-      - name: Tag release
+      - name: Create release
         if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='true'
         run: |
           npm version ${{ steps.version_check.outputs.version }}
+          git push && git push --tags
       - name: Commit changes without tag
         if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='false' && steps.build.outputs.has_changes=='true'
         run: |
           git commit -m "Update compiled action"
-      - name: Push changes to master
-        if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true'
-        run: |
-          git push && git push --tags
+          git push
       - name: Update release branch
         if: steps.check_branch_behind.outputs.BRANCH_UP_TO_DATE=='true' && steps.version_check.continue_release=='true'
         run: |
