@@ -183,6 +183,7 @@ jobs:
           npm install
           npm run version
           git_changes="$(git status --porcelain -- dist || true)"
+          if [ -n "$git_changes" ]; then
             git add -- dist
             git commit -m "Update compiled action"
             git push
