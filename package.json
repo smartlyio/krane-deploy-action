@@ -1,6 +1,6 @@
 {
   "name": "krane-deploy-action",
-  "version": "4.3.13",
+  "version": "4.3.14",
   "private": true,
   "description": "A github action to deploy services to kubernetes with https://github.com/Shopify/krane",
   "main": "lib/index.js",
