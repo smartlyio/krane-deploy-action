@@ -34,7 +34,7 @@
     "js-yaml": "4.1.0"
   },
   "devDependencies": {
-    "@actions/io": "1.1.1",
+    "@actions/io": "1.1.2",
     "@types/jest": "27.4.1",
     "@types/mock-fs": "4.13.1",
     "@types/node": "16.11.26",
