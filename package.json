@@ -37,7 +37,7 @@
     "@actions/io": "1.1.2",
     "@types/jest": "27.5.1",
     "@types/mock-fs": "4.13.1",
-    "@types/node": "16.11.36",
+    "@types/node": "16.11.38",
     "@typescript-eslint/parser": "5.27.0",
     "@vercel/ncc": "0.33.4",
     "eslint": "8.16.0",
