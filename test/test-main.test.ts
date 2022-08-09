@@ -2,7 +2,7 @@ jest.mock('../src/krane')
 jest.mock('../src/annotations')
 import {render, deploy} from '../src/krane'
 import {addAnnotation} from '../src/annotations'
-import {mocked} from 'ts-jest/utils'
+import {mocked} from 'jest-mock'
 
 import {main, getExtraBindings, BINDING_PREFIX} from '../src/main'
 
