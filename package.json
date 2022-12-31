@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@actions/io": "1.1.2",
-    "@types/jest": "29.2.4",
+    "@types/jest": "29.2.5",
     "@types/mock-fs": "4.13.1",
     "@types/node": "16.18.11",
     "@typescript-eslint/parser": "5.47.1",
