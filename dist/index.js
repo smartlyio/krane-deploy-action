@@ -371,6 +371,7 @@ function main(currentSha, dockerRegistry, kubernetesContext, kubernetesClusterDo
         const automaticChangeCauseAnnotation = (0, annotations_1.getChangeCauseAnnotation)(currentSha, extraBindings, new Date());
         const annotatedTemplates = (0, annotations_1.addAnnotation)(renderedTemplates, exports.CHANGE_CAUSE, automaticChangeCauseAnnotation);
         if (renderOnly) {
+            core.setOutput('KUBERNETES_MANIFESTS', annotatedTemplates);
             return;
         }
         yield (0, krane_1.deploy)(kranePath, kubernetesContext, kubernetesNamespace, kraneSelector, kraneTemplateDir, annotatedTemplates, deployTimeout);
