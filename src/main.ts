@@ -87,6 +87,7 @@ export async function main(
   )
 
   if (renderOnly) {
+    core.setOutput('KUBERNETES_MANIFESTS', annotatedTemplates)
     return
   }
 
