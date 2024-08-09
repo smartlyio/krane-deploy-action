@@ -1,4 +1,4 @@
-name: Build and release the action
+name: Release
 
 on:
   push:
@@ -6,100 +6,6 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set Node.js 16.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 16.x
-    - name: "Install"
-      run: |
-        npm install
-    - name: "Prettier"
-      run: |
-        npm run format-check
-    - name: "Lint"
-      run: |
-        npm run lint
-    - name: "Test"
-      run: |
-        npm run test
-    - name: "build"
-      run: |
-        npm run build
-        npm run pack
-
-  test:
-    runs-on: ubuntu-22.04
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set Node.js 16.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 16.x
-    - name: "Build action for test"
-      run: |
-        npm install
-        npm run all
-        git clean -fXd
-    - run: |
-        # Mock the krane executable
-        echo '#!/usr/bin/env bash' > ./krane.sh
-        echo 'echo "$@"' >> ./krane.sh
-        chmod u+x ./krane.sh
-        # Make a dummy template directory
-        mkdir ./templates
-        echo 'kind: Service' > ./templates/manifest.yml
-        echo 'kind: Deployment' > ./templates/template.yml.erb
-        touch ./templates/secrets.ejson
-    - name: Test rendering only
-      uses: ./
-      env:
-        KRANE_BINDING_binding2: value2
-      with:
-        currentSha: ${{ github.sha }}
-        dockerRegistry: testRegistry
-        kubernetesClusterDomain: cluster.example.com
-        kubernetesContext: testContext
-        kubernetesNamespace: testNamespace
-        kubernetesTemplateDir: ./templates
-        kranePath: ./krane.sh
-        renderOnly: true
-        extraBindings: |
-          {
-            "deployer": "user"
-          }
-    - name: Test render and deploy
-      uses: ./
-      env:
-        KRANE_BINDING_binding2: value2
-      with:
-        currentSha: ${{ github.sha }}
-        dockerRegistry: testRegistry
-        kubernetesClusterDomain: cluster.example.com
-        kubernetesContext: testContext
-        kubernetesNamespace: testNamespace
-        kubernetesTemplateDir: ./templates
-        kranePath: ./krane.sh
-        deployTimeout: 30s
-        extraBindings: |
-          {
-            "deployer": "user"
-          }
-
-  release:
-    runs-on: ubuntu-22.04
-    name: "Build and release action"
-    needs: [build, test]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: true
-      - name: Configure git
-        uses: smartlyio/github-actions@git-init-userinfo-v1
-      - name: Release flow
-        uses: smartlyio/github-actions@release-action-node-v1
-        with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
+    name: Build
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
