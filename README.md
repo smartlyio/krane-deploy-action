@@ -29,7 +29,7 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       # Running with renderOnly:true does not require login
       - name: Render templates
         uses: smartlyio/krane-deploy-action@v4
@@ -48,7 +48,7 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: smartlyio/kubernetes-auth-action@v1
         env:
           KUBERNETES_AUTH_TOKEN: ${{ secrets.KUBERNETES_AUTH_TOKEN }}
