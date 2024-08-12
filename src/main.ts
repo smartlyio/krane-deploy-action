@@ -62,9 +62,8 @@ export async function main(
   renderOnly: boolean,
   deployTimeout: string
 ): Promise<void> {
-  const extraBindings: Record<string, string> = await getExtraBindings(
-    extraBindingsRaw
-  )
+  const extraBindings: Record<string, string> =
+    await getExtraBindings(extraBindingsRaw)
 
   const renderedTemplates = await render(
     kranePath,
