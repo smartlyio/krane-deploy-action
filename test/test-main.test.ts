@@ -165,7 +165,7 @@ describe('get extra bindings', () => {
     const extraBindingsRaw: string = '{'
 
     await expect(getExtraBindings(extraBindingsRaw)).rejects.toThrow(
-      /^Unexpected end of JSON/
+      /^Expected property name or '}' in JSON at position 1/
     )
   })
 
