@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Set Node.js 20.x
@@ -30,7 +30,7 @@ jobs:
         npm run pack
 
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Set Node.js 20.x
@@ -88,7 +88,7 @@ jobs:
           }
 
   release:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     name: "Build and release action"
     needs: [build, test]
     steps:
