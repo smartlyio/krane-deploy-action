@@ -48,6 +48,6 @@
     "mock-fs": "5.4.1",
     "prettier": "3.3.3",
     "ts-jest": "29.2.5",
-    "typescript": "5.4.4"
+    "typescript": "5.7.2"
   }
 }
