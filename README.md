@@ -1,72 +1,9 @@
 # Krane deploy Action
 
-This action deploys service to kubernetes cluster with [krane](https://github.com/Shopify/krane)
+**Deprecated. Do not use this for new workflows.**
 
-## Requirements
-Requires kubectl and krane. Make sure krane is installed on your runner, only versions >= **1.1.0** are supported.
+GitHub Actions no longer deploy to Kubernetes with this action. Production deploys go through Shipit. Manifest checks go through `kube-manifest-validator` in `smartlyio/github-actions-private`.
 
-## Environment variables
-- `KRANE_BINDING_*` - All variables of this pattern will be injected as bindings to `krane render`.  The binding name will be lower-case, with the `KRANE_BINDING_` prefix removed.
+`smartlyio/kubernetes-auth-action` is a separate action and stays.
 
-## Example usage
-
-``` yaml
-name: Build & Deploy
-
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-jobs:
-  build:
-    steps:
-      - My awesome build job
-
-  validate:
-    needs: build
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-      # Running with renderOnly:true does not require login
-      - name: Render templates
-        uses: smartlyio/krane-deploy-action@v4
-        env:
-          KRANE_BINDING_canary_revision: "abc123"
-          KRANE_BINDING_user: "deploy-user"
-        with:
-          renderOnly: true
-          currentSha: ${{ github.sha }}
-          dockerRegistry: hub.docker.com
-          kubernetesClusterDomain: my-kubernetes-server.example.com
-          kubernetesContext: kube-prod
-          kubernetesNamespace: my-service-name
-
-  deploy:
-    needs: build
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-      - uses: smartlyio/kubernetes-auth-action@v1
-        env:
-          KUBERNETES_AUTH_TOKEN: ${{ secrets.KUBERNETES_AUTH_TOKEN }}
-        with:
-          kubernetesClusterDomain: my-kubernetes-server.example.com
-          kubernetesContext: kube-prod
-          kubernetesNamespace: my-service-name
-      - name: Deploy
-        uses: smartlyio/krane-deploy-action@v4
-        env:
-          KRANE_BINDING_canary_revision: "abc123"
-          KRANE_BINDING_user: "deploy-user"
-        with:
-          currentSha: ${{ github.sha }}
-          dockerRegistry: hub.docker.com
-          kubernetesClusterDomain: my-kubernetes-server.example.com
-          kubernetesContext: kube-prod
-          kubernetesNamespace: my-service-name
-```
-
-Use [docker publish action](https://github.com/smartlyio/Publish-Docker-Github-Action) to build and push docker images in `build` job.
+Existing tags (`krane-deploy-action@v4` and earlier) remain resolvable for old workflow runs. Nothing in the `smartlyio` org calls this action anymore. The last caller was `kube-check-krane-manifests` in `smartlyio/github-actions`, removed in VLCN-4318.
